@@ -39,11 +39,11 @@
 
 \# 克隆项目
 
-git clone https://github.com/your-github-name/your-project-name.git
+git clone -b nodb https://github.com/schuanhe/Plook-client.git
 
 \# 进入项目目录
 
-cd your-project-name
+cd Plook-client
 
 \# 安装依赖
 
@@ -55,12 +55,5 @@ npm run serve
 
 
 
-## 项目展示
-
-![image-20211013163403808](https://i.loli.net/2021/10/13/5J6z8v9K1Q7j2ZS.png)
-
-![image-20211013163403808](https://i.loli.net/2021/10/13/5J6z8v9K1Q7j2ZS.png)
-
-![image-20211013163403808](https://i.loli.net/2021/10/13/5J6z8v9K1Q7j2ZS.png)
 
 
