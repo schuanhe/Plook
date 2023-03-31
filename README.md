@@ -1,30 +1,22 @@
-# 项目介绍
+# Plook
 
-这是一个基于Vue.js的视频播放器，支持多人在线观看同一视频，并且可以进行实时聊天。该项目使用了WebSocket实现了多人在线聊天和视频播放的同步，使用了Element-UI作为UI框架，使用了video.js作为视频播放器。
+这个分支这种开发，请先切换到nodb分支
 
-## 项目功能
+## 项目介绍
 
-- 视频播放：支持多人在线观看同一视频，支持视频的播放、暂停、快进、快退、切换视频源等功能。
-- 实时聊天：支持多人在线聊天，支持发送文字消息。
+Plook 是一个基于 WebSocket 实现的网页端一起看功能的项目，允许用户在同一房间内共享视频，并且可以实时聊天。本项目为 Plook 的服务器端，使用 Spring Boot 框架开发，提供视频的管理、房间的管理以及 WebSocket 通信等功能。
 
-## 项目结构
+## 项目初衷
 
-```
-├── src
-│   ├── components
-│   │   ├── chat.vue
-│   │   ├── HelloWorld.vue
-│   │   └── videoDemo.vue
-│   ├── utils
-│   │   ├── socketMsg.js
-│   │   └── videoConfig.js
-│   ├── App.vue
-│   └── main.js
-├── babel.config.js
-├── package.json
-├── README.md
-└── vue.config.js
-```
+大多数视频平台的一起看功能只能看平台上的视频，用户想看的资源如果平台上没有就无法实现共享观看，所以开发了 Plook 项目，允许用户自定义视频源，实现共享观看的功能。另外，该项目也可以被异地恋情侣用于共享观看视频，增强情感交流。
+
+## 功能介绍
+
+Plook-client 提供了以下功能：
+
+1. 视频播放：用户可以通过选择播放视频的源来观看视频。
+2. 视频控制：支持视频的暂停、播放和进度条拖动操作。
+3. 实时聊天室：用户可以在视频播放的同时与其他观看视频的用户进行实时的文字聊天交流。
 
 
 
@@ -37,30 +29,40 @@
 
 ## 项目运行
 
-\# 克隆项目
+克隆项目（github）
 
-git clone https://github.com/your-github-name/your-project-name.git
+```bash
+git clone -b nodb https://github.com/schuanhe/Plook-client.git
+```
 
-\# 进入项目目录
+gitee
 
-cd your-project-name
+```bash
+git clone -b nodb https://gitee.com/huanhe/Plook-client.git
+```
 
-\# 安装依赖
+进入项目目录
 
+```bash
+cd Plook-client
+```
+
+安装依赖
+
+```bash
 npm install
+```
 
-\# 启动服务
+启动服务
 
-npm run serve
+如果你需要前后端分离，那么在项目的` src\components\HellWord.vue`的172行可以改后端地址，
 
+```bash
+# 可以直接用vite打包
+vite run build 
+```
 
+然后替换到后端的静态文件目录
 
-## 项目展示
-
-![image-20211013163403808](https://i.loli.net/2021/10/13/5J6z8v9K1Q7j2ZS.png)
-
-![image-20211013163403808](https://i.loli.net/2021/10/13/5J6z8v9K1Q7j2ZS.png)
-
-![image-20211013163403808](https://i.loli.net/2021/10/13/5J6z8v9K1Q7j2ZS.png)
-
+具体可以看后端的自述文档
 
