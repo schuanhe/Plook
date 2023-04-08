@@ -1,10 +1,10 @@
 <template>
     <el-row class="row-bg" v-if="(chatType == 0)">
-    <el-card class="box-card" body-style="padding:0px 10px;height: 60px; margin:0px;">
+    <el-card class="box-card" body-style="padding:0px 10px; margin:10px;">
         <div>
-            <p style="font-size: 5px;height: 13px; text-align:left">{{ chatList.ownerId }}</p>
+            <p style="font-size: 5px;height: 20px; text-align:left">{{ chatList.ownerId }}</p>
             <el-divider style="margin:0px" />
-            <p style="font-size: 15px;height: 20px; margin: 0px;">{{ chatList.data.msg }}</p>            
+            <p>{{ chatList.data.msg }}</p>            
         </div>
 
     </el-card>
@@ -17,15 +17,12 @@
   </el-row>
   
   <el-row class="row-bg" justify="end" v-else-if="(chatType == 2)">
-    <el-card class="box-card" body-style="padding:0px 10px;height: 60px; margin:10px;">
-        <p style="font-size: 5px;height: 13px; text-align:right">{{ userName }}</p>
+    <el-card class="box-card" body-style="padding:0px 10px; margin:10px;">
+        <p style="font-size: 5px;height: 20px; text-align:right; color: green;">{{ userName }}</p>
         <el-divider style="margin:0px" />
-        <p style="font-size: 15px;height: 20px; margin: 0px;">{{ chatList.data.msg }}</p>
+        <p>{{ chatList.data.msg }}</p>
     </el-card>    
   </el-row>
-
-
-
 
 </template>
 
@@ -38,7 +35,7 @@ export default ({
     },
     props: {
         chats: {
-            type: Object
+            type:Object
         },
         userName:{
             type:String
@@ -51,9 +48,9 @@ export default ({
         }
     },
     created() {
-        //属性渲染前
+        // //属性渲染前
          this.chatList = this.chats
-            if (this.chatList.ownerId == this.userName) {
+            if (this.chats.ownerId == this.userName) {
                 this.chatType = 2
             }else if (this.chats.type == 1) {
                 this.chatType = 1
@@ -63,10 +60,12 @@ export default ({
             }else{
                 this.chatType = 0
             }
-            console.log(this.chatType);
-
+    },
+    mounted(){
+        this.$emit('ScrollbarRef')
     },
     methods: {
+
     }
 
 })
@@ -82,7 +81,10 @@ export default ({
 }
 
 .msg_right {
-
     text-align: right;
+}
+
+#p-msginfo {
+
 }
 </style>

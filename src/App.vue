@@ -1,12 +1,10 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import chat from './components/chat.vue';
+import viewsVideo from "./views/viewsVideo.vue";
 </script>
 
 <template>
-  <hello-world/>
+    <router-view></router-view>
 </template>
 
-
-<style>
+<style scoped>
 </style>

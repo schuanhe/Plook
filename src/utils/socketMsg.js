@@ -1,9 +1,25 @@
-var data = {
-    "type":0,
-    "data":null,
-    "roomId":null,
-    "ownerId":null
-}
+let time = new Date()
+
+const data = {
+    "type": 0,    // 事件相关
+    "data": 0,   //数据
+    // "room": {   //房间信息
+    //   "id":null,
+    //   "name":null,
+    //   "admin":null
+    // }, 
+    // "owner": {    //该消息所有者信息
+    //   "id":null,
+    //   "name":null,
+    //   "time": time.toLocaleString()   //消息时间
+    // },
+    // 要删的
+    "roomId":"系统默认房间(幻鹤)",
+    "ownerId":"666"
+};
+
+
+
 
 //房间相关
 const roomFun = {
@@ -62,6 +78,17 @@ const chatFun = {
 
 }
 
+//房间管理员相关
+const rootFun = {
+  data,
+  init:()=> data.type = 4, //管理员相关
+  //请求管理员发送数据
+  askinit(askId){
+    this.init()
+    this.data.data = {"type":0,"askId":askId}
+  }
+}
+
 const socketMsg = {
     data,
   //初始化参数
@@ -72,6 +99,7 @@ const socketMsg = {
   roomFun,//房间相关
   videoFun,//视频
   chatFun,//消息
+  rootFun,//房主事件
 
 }
 
