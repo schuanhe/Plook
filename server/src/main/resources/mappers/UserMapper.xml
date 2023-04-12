@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.schuanhe.Plook.mapper.UserMapper">
+    <select id="queryUserByUp" resultType="User">
+        select *
+        from user
+        where username = #{username}
+          AND password = #{password}
+    </select>
+
+    <select id="queryUserList" resultType="User">
+        select *
+        from user
+    </select>
+
+    <select id="queryUserByUserName" resultType="User">
+        select *
+        from user
+        where username = #{username}
+    </select>
+
+    <!--
+        向user表中插入一条新的记录。
+        具体来说，它的id属性为"addUser"，参数类型为User，
+        使用自动生成的主键，并将自动生成的主键赋值给keyProperty属性指定的id字段。
+        插入的数据为username和password，分别对应User对象中的username和password属性。
+        在插入数据后，使用selectKey标签获取自动生成的主键值，并将其赋值给id字段。
+     -->
+    <insert id="addUser" parameterType="User" useGeneratedKeys="true" keyProperty="id">
+        insert into user (username,password) values (#{username},#{password})
+        <selectKey resultType="int" keyProperty="id" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+
+</mapper>
