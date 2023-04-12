@@ -25,6 +25,3 @@ logs/
 
 # 自有测试类
 /src/test/java/myTest/
-# 前端文件
-/server/src/main/resources/static/
-/client/.vscode/
