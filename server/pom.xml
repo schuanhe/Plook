@@ -58,7 +58,7 @@
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
-            <version>1.2.62</version>
+            <version>2.0.25</version>
         </dependency>
         <!-- mysql 数据库驱动 依赖 -->
         <dependency>
