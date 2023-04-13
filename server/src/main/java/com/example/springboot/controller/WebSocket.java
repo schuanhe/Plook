@@ -1,19 +1,17 @@
 package com.example.springboot.controller;
 
-import com.alibaba.fastjson.JSONObject;
 import com.example.springboot.service.SocketService;
-import com.example.springboot.service.impl.SocketServiceImpl;
 import com.example.springboot.utils.CurPool;
-import jakarta.websocket.OnClose;
-import jakarta.websocket.OnMessage;
-import jakarta.websocket.OnOpen;
-import jakarta.websocket.Session;
-import jakarta.websocket.server.PathParam;
-import jakarta.websocket.server.ServerEndpoint;
+import javax.websocket.OnClose;
+import javax.websocket.OnMessage;
+import javax.websocket.OnOpen;
+import javax.websocket.Session;
+import javax.websocket.server.PathParam;
+
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.websocket.server.ServerEndpoint;
 import java.util.List;
 import java.util.Map;
 
