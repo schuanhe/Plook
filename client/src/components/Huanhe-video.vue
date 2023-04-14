@@ -9,9 +9,13 @@
       @play="onPlay"
       @pause="onPause"
       @seeked="onPlayerSeeked"
-      @canplay="onCanplay"
       @loadstart="loadstart"
     />
+
+    <p id="rommInfoP" style="margin: 5px;">【花卉和的说法是】(666666)</p>
+    <!-- 【{{ Allinfo.room.roomId }}】({{ getUserUserName }}) -->
+    
+
   </div>
 
 </template>
@@ -32,7 +36,7 @@ export default ({
   props:{},
   //专门来读取vux的数据
   computed:{
-        ...mapState(["MyWebSocket","socketMsgStatus"]),
+        ...mapState(["MyWebSocket","socketMsgStatus","adaptiveMin"]),
         ...mapGetters(["getSocketMsgInit","getVideoInfoSrc"])
   },
     data() {
@@ -80,8 +84,20 @@ watch: {
       // 设置长宽
       setWandH(){
         let screenWidth = document.body.offsetWidth;
+
+        //自适应
+        this.$store.state.adaptiveMin = (screenWidth < 700)
+
+
+        if (this.adaptiveMin) {
+        //移动端
+        this.options.width = screenWidth  + "px"
+        this.options.height = (screenWidth*(9/16)) + "px"          
+        } else {
+        //pc端
         this.options.width = (screenWidth * 0.62) + "px"
-        this.options.height = ((screenWidth * 0.62)*(9/16)) + "px"
+        this.options.height = ((screenWidth * 0.62)*(9/16)) + "px"          
+        }
       },
 
       onPlay(){
@@ -105,13 +121,6 @@ watch: {
         //     this.scoketThrottle = true
         //   }, 100);
         // }
-      },
-      onCanplay(ev){
-        //视频可以开始播放
-
-        /**
-         * 代办项
-         *  */                                                              //获取房间详情
       },
       //浏览器开始请求资源
       loadstart(ev){

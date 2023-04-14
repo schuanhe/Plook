@@ -43,9 +43,10 @@ export default {
         //用户名暂时按照username存的
         socket.initWebSocket(this.Allinfo.user.userName)
         this.$store.commit("initMyWebSocket",socket.getWebsock())
-        
+
     },
     methods: {
+
       // 进入房间回调
       getIntoRoom(){
         console.log(this.Allinfo);
