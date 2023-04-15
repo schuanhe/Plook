@@ -33,8 +33,8 @@ const routes = [
 
 const router = createRouter({
     //
-    // history:createWebHashHistory(),
-    history:createWebHistory(import.meta.env.VITE_BASE_URL),
+    history:createWebHashHistory(),
+    // history:createWebHistory(import.meta.env.VITE_BASE_URL),
     routes
 })
 
