@@ -2,72 +2,21 @@
   <!-- 中间组件 -->
 
   <div id="div-main" class="div-main">
-
-    <!-- 小布局 -->
-    <div v-show="adaptiveMin">
+    <div class="container">
       <div id="div-video">
-        <huanhe-video />
+        <huanhe-video ref="huanheVideo" />
       </div>
-      <el-scrollbar ref="scrollbarRef" :height="scrollbarHeight">
-        <chat v-for="item in getRoomChatInfoMassgs" :key="item" :chats="item" :user-name="getUserUserName"
-          @ScrollbarRef="onScrollbarRef" />
-      </el-scrollbar>
-      <div class="send-msg" id="sendMsg">
-        <el-input v-model="myMassg" @change="setMyassg" placeholder="发送消息" />
-        <el-button @click="setMyassg">发送</el-button>
+      <div class="chat-wrapper" id="chatWrapper">
+        <el-scrollbar ref="scrollbarRef" :height="scrollbarHeight">
+          <chat v-for="item in getRoomChatInfoMassgs" :key="item" :chats="item" :user-name="getUserUserName"
+            @ScrollbarRef="onScrollbarRef" />
+        </el-scrollbar>
+        <div class="send-msg" id="sendMsg">
+          <el-input v-model="myMassg" @change="setMyassg" placeholder="发送消息" />
+          <el-button @click="setMyassg">发送</el-button>
+        </div>
       </div>
     </div>
-
-    <!-- 大布局 -->
-    <div v-show="!adaptiveMin">
-      <el-row>
-        <el-col :span="18">
-          <div id="div-video">
-            <huanhe-video />
-          </div>
-        </el-col>
-        <el-col :span="6">
-          <el-scrollbar ref="scrollbarRef" max-height="640px">
-            <chat v-for="item in getRoomChatInfoMassgs" :key="item" :chats="item" :user-name="getUserUserName"
-              @ScrollbarRef="onScrollbarRef" />
-          </el-scrollbar>
-          <div class="send-msg">
-            <el-input v-model="myMassg" @change="setMyassg" placeholder="发送消息" />
-            <el-button @click="setMyassg">发送</el-button>
-          </div>
-        </el-col>
-      </el-row>
-    </div>
-
-    <!-- 当前房间详细 -->
-
-
-
-
-
-
-    <!-- 按钮 -->
-    <!-- <div class="main">
-      <el-button type="success" round>Success</el-button>
-      <el-button type="danger" round>Danger</el-button> -->
-    <!-- <el-row style="margin: 0;">
-        <el-col >
-          
-        </el-col>
-        <el-col >
-          <div class="up"> -->
-    <!-- <button class="card1" @click="drawer.setRoom = true">设置</button>
-            <button class="card2" @click="outRoom">退出</button> -->
-
-
-    <!-- </div>
-        </el-col>
-      </el-row> -->
-
-    <!-- </div> -->
-    <!-- end按钮 -->
-
-
 
     <!-- 房间设置抽屉 -->
     <el-drawer v-model="this.$store.state.setRoom" direction="btt">
@@ -88,8 +37,6 @@
             </el-form-item>
             <el-form-item>
               <el-button type="primary" @click="setVideoSrc">切换视频源</el-button>
-
-              <button @click="setWandH">测试测试</button>
             </el-form-item>
           </el-form>
         </div>
@@ -106,7 +53,7 @@ import chat from "../components/chat.vue"
 import otherFun from '../utils/socketMsgother';
 import { ElMessage } from "element-plus";
 import { mapGetters, mapState } from "vuex"
-import { ref } from 'vue' //监听
+
 
 export default {
   name: "viewsVideo",
@@ -134,9 +81,6 @@ export default {
       }
     }
   },
-
-
-
   mounted() {
     // console.log(this.getVideoInfoSrc.url);
     this.videoSrc.src = this.getVideoInfoSrc.src
@@ -151,22 +95,21 @@ export default {
 
     this.setWandH()
     window.addEventListener('resize', this.setWandH)
-
+    //延迟执行控件读取
+    setTimeout(() => { this.setWandH() }, 1);
 
   },
   methods: {
+
     // 设置长宽
     setWandH() {
+      const mainHeight = document.getElementsByTagName("main")[0].offsetHeight
+      const divVideoHeight = document.getElementById('div-video').offsetHeight
+      const sendMsgHeight = document.getElementById('sendMsg').offsetHeight
       if (this.adaptiveMin) {
-
-        //安卓端
-        let than = this
-        setTimeout(function () {
-          let mainHeight = document.getElementsByTagName("main")[0].offsetHeight
-          let divVideoHeight = document.getElementById('div-video').offsetHeight
-          let sendMsgHeight = document.getElementById('sendMsg').offsetHeight
-          than.scrollbarHeight = (mainHeight - divVideoHeight - sendMsgHeight - 40) + "px"
-        }, 1)
+        this.scrollbarHeight = (mainHeight - divVideoHeight - sendMsgHeight - 40) + "px"
+      } else {
+        this.scrollbarHeight = (divVideoHeight - sendMsgHeight - 20) + "px"
       }
     },
 
@@ -174,9 +117,7 @@ export default {
       //组件渲染回调,自动底部
       this.$refs.scrollbarRef.setScrollTop(this.$refs.scrollbarRef.wrapRef.firstChild.clientHeight)
     },
-    outRoom() {
-      ElMessage.success("下个版本再弄吧，手动返回就行,加入交流群一起开发:486601640")
-    },
+
     setVideoSrc() {
       //设置视频资源
       let than = this
@@ -256,5 +197,39 @@ export default {
 .up {
   max-width: 30%;
   margin: 0px 0%;
+}
+
+
+/* cs */
+@media (min-width: 700px) {
+
+  .container {
+    display: grid;
+    grid-template-columns: 18fr 6fr;
+    gap: 10px;
+  }
+
+  #div-video {
+    grid-column: 1;
+  }
+
+  .chat-wrapper {
+    display: flex;
+    flex-direction: column;
+    max-height: 640px;
+  }
+
+  .send-msg {
+    display: flex;
+    align-items: center;
+  }
+
+  .send-msg el-input {
+    margin-right: 10px;
+  }
+
+  .send-msg el-button {
+    min-width: 60px;
+  }
 }
 </style>

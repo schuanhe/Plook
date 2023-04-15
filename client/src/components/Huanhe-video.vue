@@ -12,8 +12,7 @@
       @loadstart="loadstart"
     />
 
-    <p id="rommInfoP" style="margin: 5px;">【花卉和的说法是】(666666)</p>
-    <!-- 【{{ Allinfo.room.roomId }}】({{ getUserUserName }}) -->
+    <p id="rommInfoP" style="margin: 5px;">【{{ Allinfo.room.roomId }}】({{ getUserUserName }})</p>
     
 
   </div>
@@ -36,8 +35,8 @@ export default ({
   props:{},
   //专门来读取vux的数据
   computed:{
-        ...mapState(["MyWebSocket","socketMsgStatus","adaptiveMin"]),
-        ...mapGetters(["getSocketMsgInit","getVideoInfoSrc"])
+        ...mapState(["MyWebSocket","socketMsgStatus","adaptiveMin","Allinfo"]),
+        ...mapGetters(["getSocketMsgInit","getVideoInfoSrc","getUserUserName"])
   },
     data() {
         return {

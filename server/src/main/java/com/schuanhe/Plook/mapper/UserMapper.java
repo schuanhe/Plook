@@ -37,6 +37,6 @@ public interface UserMapper{
      * @return 用户数据
      */
     List<User> queryUserByUserName(@RequestParam("username") String username);
-
+    
 
 }

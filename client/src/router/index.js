@@ -25,12 +25,16 @@ const routes = [
             }
         ]
     },
+    {
+        path:"/test",
+        component:()=>import("../views/test.vue")
+    }
 ]
 
 const router = createRouter({
     //
     // history:createWebHashHistory(),
-    history:createWebHistory(),
+    history:createWebHistory(import.meta.env.VITE_BASE_URL),
     routes
 })
 
