@@ -1,4 +1,5 @@
 import msgFun from "./msgFun";
+import Cookies from "js-cookie";
 
 //对象
 const socket = {
@@ -9,8 +10,14 @@ const socket = {
   initWebSocket: function (loginName) {
     // WebSocket与普通的请求所用协议有所不同，ws等同于http，wss等同于https
     //this.websock = new WebSocket("ws://" + url + "/websocket/"+loginName+"/"+sessionId);
-    this.websock = new WebSocket("ws://localhost:1999/websocket/" + loginName);
     // this.websock = new WebSocket("ws://" + window.location.host + "/websocket/" + loginName);
+    if (import.meta.env.DEV) {
+      // 创建一个WebSocket实例，连接到本地服务器
+      this.websock = new WebSocket("ws://localhost:1999/websocket/" + loginName);
+    }else{
+      // 创建一个WebSocket实例，连接到指定的域名
+      this.websock = new WebSocket("ws://" + window.location.host + "/websocket/" + loginName);
+    }
     this.websock.onopen = this.websocketonopen;
     this.websock.onerror = this.websocketonerror;
     this.websock.onmessage = this.websocketonmessage;
@@ -37,8 +44,13 @@ const socket = {
     }
   },
   websocketclose: function (e) {
-    this.socketStatus = false;
-    //console.log("WebSocket连接关闭", e);
+    console.log("WebSocket连接关闭", e);
+      //没有就重定向
+      window.location.href = "/";
+      //弹出提示
+      ElMessage.error("webSocket连接关闭");
+      return ;
+
     //可以重连
     // if(this.curUserId != null){
     // 	if(this.curSessionId != null){

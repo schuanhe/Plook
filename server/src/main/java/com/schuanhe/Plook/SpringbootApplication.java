@@ -21,6 +21,11 @@ public class SpringbootApplication {
         List<String> names = new ManagedList<>();
 
         CurPool.roomList.put("系统默认房间(幻鹤)",names);
+        CurPool.roomList.put("系统默认房间(1)",names);
+        CurPool.roomList.put("系统默认房间(2)",names);
+        CurPool.roomList.put("系统默认房间(3)",names);
+
+
 
     }
 

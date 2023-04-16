@@ -4,6 +4,8 @@ export default createStore({
   //所有的数都放在这里
   state: {
     counter: 0,
+    setRoom: false,     //房间设置弹出
+    adaptiveMin:true,    //自适应小
     socketMsgStatus: true, //后端回调，true 为正常，false表示最近切换过一次视频进度
     MyWebSocket:null,   //websocket连接
     MyVideo:{
@@ -123,6 +125,9 @@ export default createStore({
     },
     setVideoInfoSrc(state,src){
       state.Allinfo.room.videoInfo.src = src
+    },
+    setadaptiveMin(state,adaptiveMin){
+      state.adaptiveMin = adaptiveMin
     }
   },
   //为异步操作准备

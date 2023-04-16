@@ -21,6 +21,7 @@ import layoutHeader from "../layout/layoutHeader.vue";
 import layoutFooter from "../layout/layoutFooter.vue";
 import otherFun from "../utils/socketMsgother"
 import socket from '../utils/socketFun';
+import Cookies from "js-cookie";
 import { mapState } from "vuex"
 // import HuanheVideo from '../components/Huanhe-video.vue';
 // import chat from "../components/chat.vue"
@@ -41,11 +42,20 @@ export default {
     },
     mounted() {
         //用户名暂时按照username存的
-        socket.initWebSocket(this.Allinfo.user.userName)
-        this.$store.commit("initMyWebSocket",socket.getWebsock())
-        
+
+        //判断cookie是否存在，来连接websocket
+        if(Cookies.get("userId")){
+            socket.initWebSocket(Cookies.get("userId"))
+            this.$store.commit("initMyWebSocket",socket.getWebsock())
+        }else{
+            this.$router.push("/login")
+        }
+        // socket.initWebSocket(this.Allinfo.user.userName)
+       
+
     },
     methods: {
+
       // 进入房间回调
       getIntoRoom(){
         console.log(this.Allinfo);

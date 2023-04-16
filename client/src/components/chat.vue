@@ -84,7 +84,4 @@ export default ({
     text-align: right;
 }
 
-#p-msginfo {
-
-}
 </style>

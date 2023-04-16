@@ -32,4 +32,6 @@ public class CurPool {
     //通过房间id,获取房间所有人的list
     public static Map<Integer,List<Integer>> roomIdByIdList = new HashMap<>();
 
+
+
 }

@@ -10,6 +10,7 @@
 
 <script>
 import { ElMessage } from "element-plus";
+import Cookie from "js-cookie";
 import { mapState } from "vuex"
 export default {
     name:"login",
@@ -27,6 +28,10 @@ export default {
                 ElMessage.error("请输入用户名")
             }else{
                 this.$store.commit("setUserUserName",this.userName)
+                //这里留作来判断登录
+                
+                //账号密码正确，设置cookie,并跳转
+                Cookie.set("userId",this.userName)
                 this.$router.push('pc')
             }
         }
@@ -41,12 +46,12 @@ export default {
   align-items: center;
   flex-direction: column;
   height: 100vh;
-
+  
 }
 
 .el-card {
     height: 30%;
-
+    
 }
 
 .p-div {

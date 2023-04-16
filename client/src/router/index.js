@@ -1,4 +1,4 @@
-import { createRouter,createWebHashHistory } from "vue-router"
+import { createRouter,createWebHashHistory, createWebHistory } from "vue-router"
 
 const routes = [
     {
@@ -27,21 +27,14 @@ const routes = [
     },
     {
         path:"/test",
-        name:"cs",
-        component:()=>import('../views/test.vue'),
-        //二级导航
-        children:[
-            {
-                path:"test22",
-                component:()=>import('../components/testZj.vue')
-            },
-        ]
+        component:()=>import("../views/test.vue")
     }
 ]
 
 const router = createRouter({
     //
     history:createWebHashHistory(),
+    // history:createWebHistory(import.meta.env.VITE_BASE_URL),
     routes
 })
 

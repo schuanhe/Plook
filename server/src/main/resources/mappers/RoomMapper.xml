@@ -36,4 +36,6 @@
         FROM room_chat
         WHERE room_id = #{id}
     </select>
+
+
 </mapper>

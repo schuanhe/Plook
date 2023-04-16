@@ -1,78 +1,75 @@
 <template>
-<p>1</p>
-
-<router-view></router-view>
-
-<p>vuews读取路由{{ csvuex }}</p>
-<button @click="test02">更改参数cs值魏211</button>
-<button @click="test03">更改vuex参数211</button>
-<button @click="test04">发送消息</button>
-<button @click="test05">进入房间</button>
-<button @click="test06">vuex对视频控制</button>
-<button @click="test07">通过id拿属性</button>
-
+    <div id="div-main" class="div-main">
+        <div class="container">
+            <div id="div-video">
+                <huanhe-video ref="huanheVideo" />
+            </div>
+            <div class="chat-wrapper">
+                <el-scrollbar ref="scrollbarRef" height="300px">
+                    <chat v-for="item in getRoomChatInfoMassgs" :key="item" :chats="item" :user-name="getUserUserName"
+                        @ScrollbarRef="onScrollbarRef" />
+                </el-scrollbar>
+                <div class="send-msg">
+                    <el-input v-model="myMassg" @change="setMyassg" placeholder="发送消息" />
+                    <el-button @click="setMyassg">发送</el-button>
+                </div>
+            </div>
+        </div>
+    </div>
 </template>
 
-<script >
-import socket from '../utils/socketFun';
-import testZj from '../components/testZj.vue';
-import { mapState } from "vuex"
+<script>
 import HuanheVideo from '../components/Huanhe-video.vue';
+import chat from "../components/chat.vue"
 export default {
-    name:"test",
     components: {
-        testZj,
-        HuanheVideo,
-    },
-    data(){
-        return{
-            cs:133
-        }
-    },
-    //专门来读取vux的数据
-    computed:{
-        ...mapState(["csvuex"])
-    },
-    mounted(){
-        socket.initWebSocket("666")
-        this.$store.commit("initMyWebSocket",socket.getWebsock())
-    },
-    methods:{
-        test01(){
-            console.log("我懂");
-        },
-        test02(){
-            this.cs = 6
-            console.log(this.cs);
-        },
-        test03(){
-            this.$store.commit("addcsvuex")
-            console.log(this.csvuex);
-        },
-        test04(){
-            //socket.send('{"type":2,"data":{"type":0,"play":1},"roomId":"系统默认房间(幻鹤)","ownerId":"666"}')
-            console.log(this.$store.getters.getMyWebSocket.send('{"type":2,"data":{"type":0,"play":1},"roomId":"系统默认房间(幻鹤)","ownerId":"666"}')); 
-        },
-        test05(){
-            // socket.send('{"type":1,"data":{"type":1},"roomId":"系统默认房间(幻鹤)","ownerId":"666"}')
-            console.log(this.$store.getters.getMyWebSocket.send('{"type":1,"data":{"type":1},"roomId":"系统默认房间(幻鹤)","ownerId":"666"}'))
-        },
-        test06(){
-            console.log(this.$store.getters.getMyVideo.aVideo.play(1)); 
-        },
-        test07(){
-            // Media = ;
-            console.log(document.getElementById("dPlayerVideoMain"));
-        },
-        //子控件发送函数
-        WebSocketSend(msg){
-            socket.send(msg)
-        }
-    }
-
+    HuanheVideo,
+    chat
+  },
 }
 </script>
 
 <style>
+
+/* cs */
+@media (min-width: 700px) {
+  
+  .container {
+    display: grid;
+    grid-template-columns: 18fr 6fr;
+    gap: 10px;
+  }
+  
+  #div-video {
+    grid-column: 1;
+  }
+  
+  .chat-wrapper {
+    display: flex;
+    flex-direction: column;
+    max-height: 640px;
+  }
+  
+  .send-msg {
+    display: flex;
+    align-items: center;
+  }
+  
+  .send-msg el-input {
+    margin-right: 10px;
+  }
+  
+  .send-msg el-button {
+    min-width: 60px;
+  }
+}
+
+@media (min-width: 700px) {
+  .el-scrollbar__wrap {
+    max-height: none !important;
+    overflow: hidden;
+  }
+}
+
 
 </style>
