@@ -17,6 +17,8 @@ import java.util.List;
 public class Room {
     private Integer id;     //房间id
     private String name;    //房间的名称
-    private Integer admin;  //管理员id
-    private List<RoomChat> roomChats; //聊天的记录
+    private String admin;   //房间的管理员(创建者)
+    private boolean room_aut; //房间是否需要密码false：不需要，true：需要
+    private String room_password; //房间的密码
+    private List<String> users; //房间的用户
 }

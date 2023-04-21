@@ -70,7 +70,6 @@ watch: {
     getVideoInfoSrc: { 
       handler(nv) {
         //对属性监听
-        console.log(nv);
         this.options.src = nv.src
         this.options.type = nv.type
       },
@@ -101,7 +100,6 @@ watch: {
 
       onPlay(){
         this.MyWebSocket.send(socketMsg.videoFun.play(1))
-        console.log("播放");
       },
       onPause(){
         this.MyWebSocket.send(socketMsg.videoFun.play(0))

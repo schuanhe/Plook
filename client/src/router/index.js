@@ -16,12 +16,13 @@ const routes = [
             {
                 path:"selectRoom",
                 name:"选择房间",
+                
                 component:()=>import("../components/selectRoom.vue")
             },
             {
-                path:"video",
-                name:"视频详情",
-                component:()=>import("../components/viewsVideo.vue")
+                path:"room/:roomId",
+                name:"进入房间",
+                component:()=>import("../components/roomVideo.vue")
             }
         ]
     },

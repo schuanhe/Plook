@@ -32,9 +32,9 @@ const roomFun = {
         return JSON.stringify(data)
     },
     //进入房间
-    joinRoom(){
+    initRoom(){
         this.init()
-        this.data.data = {"type":1}
+        this.data.data = {"type":1} //发送请求初始化
         //this.data.roomId = roomId //房间加入
         return JSON.stringify(data)
     }

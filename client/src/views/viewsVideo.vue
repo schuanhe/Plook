@@ -7,7 +7,7 @@
         </el-header>
 
         <el-main>
-            <router-view @getIntoRoom="getIntoRoom"></router-view>
+            <router-view></router-view>
         </el-main>
 
         <el-footer>
@@ -19,7 +19,6 @@
 <script >
 import layoutHeader from "../layout/layoutHeader.vue";
 import layoutFooter from "../layout/layoutFooter.vue";
-import otherFun from "../utils/socketMsgother"
 import socket from '../utils/socketFun';
 import Cookies from "js-cookie";
 import { mapState } from "vuex"
@@ -42,11 +41,11 @@ export default {
     },
     mounted() {
         //用户名暂时按照username存的
-
         //判断cookie是否存在，来连接websocket
         if(Cookies.get("userId")){
             socket.initWebSocket(Cookies.get("userId"))
-            this.$store.commit("initMyWebSocket",socket.getWebsock())
+            this.$store.commit("initMyWebSocket",socket.getWebsock())            
+            this.$store.commit("setUserUserName",Cookies.get("userId"))
         }else{
             this.$router.push("/login")
         }
@@ -57,11 +56,11 @@ export default {
     methods: {
 
       // 进入房间回调
-      getIntoRoom(){
-        console.log(this.Allinfo);
-        this.MyWebSocket.send(otherFun.getIntoRoomFun(this.Allinfo))
-        this.$router.push("video")
-      },
+    //   getIntoRoom(roomId){
+    //     console.log(roomId);
+    //     this.MyWebSocket.send(otherFun.getIntoRoomFun(this.Allinfo))
+    //     this.$router.push("room/"+roomId)
+    //   },
     }
 
 }

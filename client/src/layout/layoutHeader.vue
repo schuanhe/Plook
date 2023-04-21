@@ -21,10 +21,15 @@
 
 <script>
 import { ElMessage } from "element-plus";
+//退出房间api
+import { exitRoom } from "../api/room";
 export default {
   methods:{
     outRoom() {
-      ElMessage.success("下个版本再弄吧，手动返回就行,加入交流群一起开发:486601640")
+      exitRoom().then(res => {
+        ElMessage.success("退出房间成功")
+        this.$router.push({name: '选择房间'})
+      })
     },
   }
 }

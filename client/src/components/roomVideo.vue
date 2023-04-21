@@ -53,6 +53,7 @@ import chat from "../components/chat.vue"
 import otherFun from '../utils/socketMsgother';
 import { ElMessage } from "element-plus";
 import { mapGetters, mapState } from "vuex"
+import { joinRoom } from "../api/room"
 
 
 export default {
@@ -64,7 +65,7 @@ export default {
   //专门来读取vux的数据
   computed: {
     ...mapState(["MyWebSocket", "Allinfo", "adaptiveMin"]),
-    ...mapGetters(["getRoomChatInfoMassgs", "getUserUserName", "getVideoInfoSrc"]),
+    ...mapGetters(["getRoomChatInfoMassgs", "getUserUserName", "getVideoInfoSrc","getUserSocketStatus"]),
   },
   data() {
     return {
@@ -86,21 +87,61 @@ export default {
     this.videoSrc.src = this.getVideoInfoSrc.src
     this.videoSrc.type = this.getVideoInfoSrc.type
     console.log(this.videoSrc.type);
+    // 初始化房间信息
+    //获取路由中的房间id
+    this.roomId = this.$route.params.roomId
+    
+    //将roomid放到路由中
+    this.$store.commit("setRoomRoomId", this.roomId)
 
     //自适应
-
     let screenWidth = document.body.offsetWidth;
     this.$store.commit("setadaptiveMin", (screenWidth < 700))
     //小布局则初始化
-
     this.setWandH()
     window.addEventListener('resize', this.setWandH)
     //延迟执行控件读取
     setTimeout(() => { this.setWandH() }, 1);
 
+    //如果是连接状态则不是重连
+    if (this.getUserSocketStatus) {
+      this.initRoom()
+      console.log("新连接同步");
+    }
+  },
+  watch: {
+    //对连接状态监听
+    getUserSocketStatus: {
+      handler(nv) {
+        console.log(nv,7777777);
+        //如果变化到连接
+        if (nv) {
+          joinRoom(this.roomId).then(res => {
+            if (res.code!=200) {
+              //跳回到选房间
+              ElMessage.error("房间已解散")
+              this.$router.push("/pc/selectRoom")
+            }else{
+              this.initRoom()
+              console.log("重连同步");
+              ElMessage.success("回到房间成功成功")
+            }
+          })
+        }
+      },
+      deep: false,
+    },
+
   },
   methods: {
-
+    //初始化数据
+    initRoom(){
+      //如果没连接那么就是刷新进入
+      if (this.MyWebSocket!=null) {
+        this.MyWebSocket.send(otherFun.initRoom(this.Allinfo))
+      }
+      
+    },
     // 设置长宽
     setWandH() {
       const mainHeight = document.getElementsByTagName("main")[0].offsetHeight
@@ -137,11 +178,14 @@ export default {
     //===============
     //发送消息
     setMyassg() {
+      if (this.myMassg!="") {
       let socketMsg = otherFun.setMyassg(this.myMassg)
       this.MyWebSocket.send(socketMsg) //发送消息
       this.$store.commit("setRoomChatInfoMassg", JSON.parse(socketMsg))
       this.myMassg = "" //清空编辑框
-      ElMessage.success('发送成功.')
+      ElMessage.success('发送成功.')        
+      }
+
     },
   }
 

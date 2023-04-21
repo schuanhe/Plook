@@ -2,6 +2,7 @@ package com.schuanhe.Plook.utils;
 
 
 import com.schuanhe.Plook.controller.WebSocket;
+import com.schuanhe.Plook.entity.Room;
 
 import java.util.HashMap;
 import java.util.List;
@@ -17,7 +18,10 @@ public class CurPool {
     public static Map<String, WebSocket> webSockets = new ConcurrentHashMap<>();
 
     //房间 房间id，进入房间的用户id
-    public static Map<String, List<String>> roomList = new HashMap<>();
+    //public static Map<String, List<String>> roomList = new HashMap<>();
+
+    //房间 房间id，房间的信息
+    public static Map<String, Room> roomList = new HashMap<>();
 
     //记录这个b在那个房间 用户id，房间id
     public static Map<String,String> userByRoom = new HashMap<>();

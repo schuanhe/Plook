@@ -1,5 +1,6 @@
 import msgFun from "./msgFun";
 import Cookies from "js-cookie";
+import store from "../store";
 
 //对象
 const socket = {
@@ -8,29 +9,26 @@ const socket = {
   },
 
   initWebSocket: function (loginName) {
-    // WebSocket与普通的请求所用协议有所不同，ws等同于http，wss等同于https
-    //this.websock = new WebSocket("ws://" + url + "/websocket/"+loginName+"/"+sessionId);
-    // this.websock = new WebSocket("ws://" + window.location.host + "/websocket/" + loginName);
-    if (import.meta.env.DEV) {
-      // 创建一个WebSocket实例，连接到本地服务器
-      this.websock = new WebSocket("ws://localhost:1999/websocket/" + loginName);
-    }else{
-      // 创建一个WebSocket实例，连接到指定的域名
+    if (import.meta.env.VITE_BASE_WS_S == "true") {
       this.websock = new WebSocket("ws://" + window.location.host + "/websocket/" + loginName);
+    }else{
+      this.websock = new WebSocket(import.meta.env.VITE_BASE_WS +"/websocket/" + loginName); 
     }
+    
     this.websock.onopen = this.websocketonopen;
-    this.websock.onerror = this.websocketonerror;
+    this.websock.onerror = this.websocketonerror;  
     this.websock.onmessage = this.websocketonmessage;
     this.websock.onclose = this.websocketclose;
   },
   websocketonopen: function () {
+    store.commit("setUserSocketStatus",true)
     console.log("连接成功");
   },
   websocketonerror: function (e) {
     console.log("WebSocket连接发生错误", e);
   },
   websocketonmessage: function (e) {
-    console.log("后端来消息咯", e.data);
+    // console.log("后端来消息咯", e.data);
     let datas = JSON.parse(e.data);
 
     if (datas.type == 1) {
@@ -65,3 +63,4 @@ const socket = {
 };
 
 export default socket;
+

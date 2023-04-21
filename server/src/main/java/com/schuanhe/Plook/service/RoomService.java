@@ -1,16 +1,25 @@
 package com.schuanhe.Plook.service;
 
 import com.schuanhe.Plook.entity.Room;
-import com.schuanhe.Plook.entity.RoomChat;
 
 public interface RoomService {
 
     /**
-     * 添加房间，数据库没用则加入
-     * @param userId userId
-     * @return 返回
+     * 创建房间
+     * @param room 房间的参数
+     * @return 房间
      */
-    boolean addRoom(Integer userId,String roomName);
+    Room createRoom(Room room);
+
+    /**
+     * 退出房间
+     */
+    void exitRoom(String id);
+
+    /**
+     * 加入房间
+     */
+    boolean joinRoom(Room room,String userId);
 
     /**
      * 通过id获取房间信息

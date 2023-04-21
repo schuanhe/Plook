@@ -19,11 +19,7 @@ export default createStore({
         userId: null, //用户id
         userName: null, //用户名
         //socket数据
-        socketInfo: {
-          status: false, //链接状态
-          roomList: [], //房间列表
-          // scoketThrottle: true, //节流函数
-        },
+        socketStatus: false, //是否连接状态
       },
       //房间数据
       room: {
@@ -90,6 +86,9 @@ export default createStore({
         roomId:state.Allinfo.room.roomId
       }
     },
+    getUserSocketStatus(state){
+      return state.Allinfo.user.socketStatus
+    }
 
   },
   //改变数据函数
@@ -113,9 +112,6 @@ export default createStore({
     setUserUserName(state,userName){
         state.Allinfo.user.userName = userName
     },
-    setUserSocketInfoRoomList(state,roomList){
-        state.Allinfo.user.socketInfo.roomList = roomList
-    },
     setRoomChatInfoMassg(state,massg){
       // 添加房间单条聊天数据
       state.Allinfo.room.chatInfo.Massgs.push(massg)
@@ -128,6 +124,10 @@ export default createStore({
     },
     setadaptiveMin(state,adaptiveMin){
       state.adaptiveMin = adaptiveMin
+    },
+    setUserSocketStatus(state,status){
+      console.log("设置socket状态");
+      state.Allinfo.user.socketStatus = status
     }
   },
   //为异步操作准备

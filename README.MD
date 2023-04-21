@@ -1,8 +1,20 @@
-# Plook 
+# Plook
+
+
+
+![stars img](https://img.shields.io/github/stars/schuanhe/Plook)
+
+
 
 还有nodb(不需要数据库)分支哦
 
 ## 新加功能
+2023/04/21更新
+1. 添加创建房间功能
+2. 修复播放界面刷新就会报错的bug
+3. 用户进入房间会初始化同步
+4. 前端可以通过修改.env文件配置后端
+
 2023/04/15 更新
 增加手机端自适应，修复bug若干
 
@@ -11,7 +23,6 @@
 - [ ] 用户信息持久化
 - [ ] 房间消息持久化
 - [ ] 等待添加
-
 
 ## 项目介绍
 
@@ -31,6 +42,11 @@ Plook 是一个基于 WebSocket 实现的网页端一起看功能的项目，允
 - Vue.js
 - Element-UI
 - video.js
+
+
+## star History
+![Star History Chart](https://api.star-history.com/svg?repos=schuanhe/Plook&type=Date)
+
 
 ## 其他
 

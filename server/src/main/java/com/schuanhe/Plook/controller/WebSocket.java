@@ -39,10 +39,9 @@ public class WebSocket {
         this.session = session;
         this.name = name;
         CurPool.webSockets.put(name,this);
-        log.info("[链接成功]name={} session={} socket={} 数量:{}",name,session,this,CurPool.webSockets.size());
-        //发送 房间 数据返回
+        log.info("[链接成功]name={} socket={} 数量:{}",name,this,CurPool.webSockets.size());
+
         Map<String, Object> map = SocketService.onOpen(name);
-        System.out.println(map);
         sendMassageList(map);
 
     }
@@ -59,8 +58,7 @@ public class WebSocket {
     public void onMessage(String message) {
         Map<String, Object> map = SocketService.onMessage(message);
         sendMassageList(map);
-        System.out.println("【websocket消息】收到客户端消息:"+message);
-        log.info("[收到客户端消息]name={} session={} socket={} 数量:{}",name,session,this,CurPool.webSockets.size());
+        log.info("[收到客户端消息]name={} message={} map={} 数量:{}",name,message,map,CurPool.webSockets.size());
     }
 
     //发送消息
@@ -68,10 +66,12 @@ public class WebSocket {
 
         //for (Object name : (List) sendMsg.get("names")) {
         //    if(sendMsg.containsKey("ownerId")){
+        //        //list包括消息发送者
         //        if(!sendMsg.get("ownerId").equals(name)){
-        //            //list包括消息发送者,这次循环是否有消息发送者
+        //            //不是消息发送者
         //            sendMassage(name.toString(),sendMsg.get("data").toString());
         //        }else {
+        //            //本次是消息发送者
         //            System.out.println("跳过本次发送");
         //        }
         //    }else {
@@ -80,35 +80,21 @@ public class WebSocket {
         //    }
         //}
 
-        // CHAT GPT 优化版
-        Object namesObj = sendMsg.get("names");
-        if (namesObj instanceof List) {
-            // 获取 names 的值，如果类型是 List 则进行强制类型转换
-            List<String> namesList = (List<String>) namesObj;
-            // 提取消息数据，避免重复访问
-            String msgData = Objects.toString(sendMsg.get("data"), "");
-            // 使用 Java 8 中的 Stream 对列表进行过滤和循环遍历
-            namesList.stream()
-                    // filter() 过滤出符合条件的元素
-                    .filter(name -> {
-                        if (sendMsg.containsKey("ownerId")) { // 如果包含 ownerId 属性，则需要跳过发送者的名称
-                            return !sendMsg.get("ownerId").equals(name);
-                        } else {
-                            return true; // 不包含 ownerId 属性则所有名称都可以发送
-                        }
-                    })
-                    // forEach() 将处理后的名称信息传入发送函数中
-                    .forEach(name -> sendMassage(name.toString(), msgData));
-        }else {
-            log.info("【群消息发送错误】names不是数组{}",sendMsg);
+        //判断是否为空
+        if (Objects.isNull(sendMsg)||sendMsg.isEmpty()){
+            return;
         }
-
-        System.out.println(sendMsg);
+        log.info("发送消息:{}",sendMsg);
+        ((List<?>) sendMsg.get("names")).stream()
+                .filter(name -> !sendMsg.containsKey("ownerId") || !sendMsg.get("ownerId").equals(name))
+                .forEach(name -> sendMassage(name.toString(), sendMsg.get("data").toString()));
     }
 
     //发送消息
     public void sendMassage(String name,String message){
-        System.out.println(name);
+        if (!CurPool.webSockets.containsKey(name)) {
+            return;
+        }
         Session session = CurPool.webSockets.get(name).session;
         if (session != null) {
             try {

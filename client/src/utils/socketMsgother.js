@@ -14,19 +14,20 @@ const data = {
     //   "time": time.toLocaleString()   //消息时间
     // },
     // 要删的
-    "roomId":"默认房间",
-    "ownerId":"默认名称"
+    "roomId":"",
+    "ownerId":""
 };
 
 // 其他函数
 const otherFun = {
-    getIntoRoomFun(Allinfo){
+    //初始化房间信息,给客户端发送消息
+    initRoom(Allinfo){
         //房间加入
         data
         data.type = 1
-        data.data = {"type":1}
+        data.data = {"type":0}
         data.roomId = Allinfo.room.roomId 
-        data.ownerId = Allinfo.user.userName  //
+        data.ownerId = Allinfo.user.userName
     return JSON.stringify(data)
     },
     setMyassg(massg){
