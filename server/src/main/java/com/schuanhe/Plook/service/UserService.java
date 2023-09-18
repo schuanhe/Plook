@@ -10,18 +10,13 @@ public interface UserService {
      * @param user 用户数据
      * @return 成功登录用户数据
      */
-    User Login(User user);
+    User Login(User user) throws Exception;
 
     /**
      * 注册
      * @param user 用户数据
      * @return 成功则是包括id的用户数据，失败则没用id
      */
-    User Register(User user);
+    User Register(User user) throws Exception;
 
-    /**
-     * 查询使用用户数据
-     * @return 用户数据
-     */
-    List<User> queryUserList();
 }

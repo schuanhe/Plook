@@ -1,69 +1,47 @@
 <template>
     <el-container>
-
-
         <el-header>
             <layoutHeader />
         </el-header>
-
         <el-main>
             <router-view></router-view>
         </el-main>
-
         <el-footer>
             <layoutFooter />
         </el-footer>
     </el-container>
 </template>
 
-<script >
+<script setup>
 import layoutHeader from "../layout/layoutHeader.vue";
 import layoutFooter from "../layout/layoutFooter.vue";
 import socket from '../utils/socketFun';
 import Cookies from "js-cookie";
 import { mapState } from "vuex"
+import { onBeforeMount } from "vue"
+import { ElMessage } from "element-plus";
+import { useRouter } from 'vue-router';
+import { getRoomList } from "../api/room";
 // import HuanheVideo from '../components/Huanhe-video.vue';
 // import chat from "../components/chat.vue"
-export default {
-    name: "viewsVideo",
-    components: {
-        layoutFooter,
-        layoutHeader,
-        // HuanheVideo,
-        // chat
-    },
-    //专门来读取vux的数据
-    computed:{
-      ...mapState(["Allinfo","MyWebSocket"])
-    },
-    data() {
-        return {}
-    },
-    mounted() {
-        //用户名暂时按照username存的
-        //判断cookie是否存在，来连接websocket
-        if(Cookies.get("userId")){
-            socket.initWebSocket(Cookies.get("userId"))
-            this.$store.commit("initMyWebSocket",socket.getWebsock())            
-            this.$store.commit("setUserUserName",Cookies.get("userId"))
-        }else{
-            this.$router.push("/login")
-        }
-        // socket.initWebSocket(this.Allinfo.user.userName)
-       
+const router = useRouter();
+      //进入房间回调
 
-    },
-    methods: {
-
-      // 进入房间回调
-    //   getIntoRoom(roomId){
-    //     console.log(roomId);
-    //     this.MyWebSocket.send(otherFun.getIntoRoomFun(this.Allinfo))
-    //     this.$router.push("room/"+roomId)
-    //   },
-    }
-
+// 初始话
+const init = () =>{
+    if(Cookies.get("userId")){
+        // 去获取房间列表
+        router.push("/pc/selectRoom")
+    }else{
+        ElMessage.error("请先登录")
+        router.push("/")
+    }    
 }
+
+// 页面挂载前请求
+onBeforeMount(()=>{
+    init()
+})
 </script>
 <style scoped>
 /* Use flexbox to center the div-video element horizontally and vertically */

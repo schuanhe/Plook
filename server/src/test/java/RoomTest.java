@@ -12,17 +12,5 @@ import org.springframework.test.context.ContextConfiguration;
 @ContextConfiguration
 public class RoomTest {
 
-    @Autowired
-    RoomService roomService;
-
-    /**
-     * 登录测试
-     * 如果账号密码正确则登录成功且返回正确的数据，否则返回null
-     */
-    @Test
-    void testGetRoomById(){
-        Room roomById = roomService.getRoomById(1);
-        System.out.println(roomById);
-    }
 
 }

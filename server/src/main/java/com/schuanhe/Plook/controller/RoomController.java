@@ -1,12 +1,15 @@
 package com.schuanhe.Plook.controller;
 
 import com.schuanhe.Plook.entity.Room;
+import com.schuanhe.Plook.entity.RoomFrom;
 import com.schuanhe.Plook.service.RoomService;
 import com.schuanhe.Plook.utils.CurPool;
 import com.schuanhe.Plook.utils.ResponseResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 
 @Slf4j
@@ -22,17 +25,13 @@ public class RoomController {
      * @return {ResponseResult} - 一个 ResponseResult 对象，包含成功创建房间信息。
      */
     @PostMapping("/createRoom")
-    public ResponseResult createRoom(@RequestBody Room room,@CookieValue("userId") String userId) {
-        //判断用户是否在线
-        log.info("[{}]创建房间:{}", userId, room);
-        //if (room.getAdmin() == null || !CurPool.webSockets.containsKey(room.getAdmin())) {
-        //    return ResponseResult.error("用户不在线");
-        //}
-        //判断当前cookie和创建者id是否相同
-        if (!room.getAdmin().equals(userId)) {
-            return ResponseResult.error("非法操作");
+    public ResponseResult<?> createRoom(@RequestBody RoomFrom roomFrom, @CookieValue("userId") String userId) {
+        RoomFrom newRoom;
+        try {
+            newRoom = roomService.createRoom(roomFrom,userId);
+        }catch (Exception e){
+            return ResponseResult.error(e.getMessage());
         }
-        Room newRoom = roomService.createRoom(room);
         // 返回成功创建房间后的房间的信息
         return ResponseResult.success(newRoom);
     }
@@ -40,42 +39,50 @@ public class RoomController {
     /**
      * 加入房间
      */
-    @RequestMapping("/joinRoom/{roomId}")
-    public ResponseResult joinRoom(@PathVariable String roomId,@CookieValue("userId") String userId) {
+    @RequestMapping("/joinRoom")
+    public ResponseResult<?> joinRoom(@RequestBody RoomFrom room,@CookieValue("userId") String userId) {
         //判断参数是否完整
-        if (roomId == null || roomId.isEmpty()|| userId == null || userId.isEmpty()) {
-            return ResponseResult.error("参数不完整");
+        try {
+            roomService.joinRoom(room, userId);
+        }catch (Exception e){
+            return ResponseResult.error(e.getMessage());
         }
-        //判断用户是否存在
-        //if (!CurPool.webSockets.containsKey(userId)) {
-        //    return ResponseResult.error("用户不存在");
-        //}
-        //判断房间是否存在
-        Room room = CurPool.roomList.get(roomId);
-        if (room == null) {
-            return ResponseResult.fail("房间不存在");
-        }
-        //用户是否在房间中
-        if (room.getUsers().contains(userId)) {
-            return ResponseResult.success("用户已经在房间里了");
-        }
-        roomService.joinRoom(room, userId);
         return ResponseResult.success("加入成功");
     }
+
     /**
-     * 获取房间列表
+     * 获取房间 信息
+     */
+    @GetMapping("/getRoom/{roomId}")
+    public ResponseResult<?> getRoom(@PathVariable Integer roomId, @CookieValue("userId") String userId) {
+        RoomFrom roomFrom;
+        try {
+            roomFrom = roomService.getRoom(roomId,userId);
+        }catch (Exception e){
+            return ResponseResult.error(e.getMessage());
+        }
+        return ResponseResult.success(roomFrom);
+    }
+
+    /**
+     * 获取公开房间列表
      */
     @GetMapping("/getRoomList")
-    public ResponseResult getRoomList() {
-        return ResponseResult.success(CurPool.roomList);
+    public ResponseResult<?> getRoomList() {
+        Map<Integer, String> roomListMap = roomService.getRoomListMap();
+        return ResponseResult.success(roomListMap);
     }
 
     /**
      * 退出房间
      */
-    @RequestMapping("/exitRoom")
-    public ResponseResult exitRoom(@CookieValue("userId") String userId) {
-        roomService.exitRoom(userId);
+    @RequestMapping("/exitRoom/{roomId}")
+    public ResponseResult<?> exitRoom(@PathVariable Integer roomId , @CookieValue("userId") String userId) {
+        try {
+            roomService.exitRoom(roomId,userId);
+        }catch (Exception e){
+            return ResponseResult.error(e.getMessage());
+        }
         return ResponseResult.success("退出成功");
     }
 

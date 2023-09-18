@@ -13,19 +13,27 @@ export function createRoom(data) {
 
 /**
  * 加入房间
- * @param {*} id 房间id
- * @returns 
  */
-export function joinRoom(id) {
-  // 使用request函数发送一个PUT请求，请求的URL为/user/id
+export function joinRoom(data) {
   return request({
     url: `/room/joinRoom/${id}`,
+    method: 'post',
+    data
+  })
+}
+
+/**
+ * 获取房间信息
+ */
+export function getRoomInfo(rid) {
+  return request({
+    url: `/room/getRoom/${rid}`,
     method: 'get',
   })
 }
 
 /**
- * 获取房间列表
+ * 获取公开房间列表
  */
 export function getRoomList() {
   return request({
@@ -37,9 +45,9 @@ export function getRoomList() {
 /**
  * 退出房间
  */
-export function exitRoom(id) {
+export function exitRoom(rid) {
   return request({
-    url: `/room/exitRoom`,
+    url: `/room/exitRoom/${rid}`,
     method: 'get',
   })
 }

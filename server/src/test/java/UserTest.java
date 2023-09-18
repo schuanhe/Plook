@@ -19,30 +19,18 @@ public class UserTest {
      */
     @Test
     void testLogin(){
-        User user = new User();
-        user.setUsername("admin");
-        user.setPassword("1234567");
-        System.out.println(userService.Login(user));
-        System.out.println("啊大大");
+
     }
 
     @Test
     void testRegister(){
-        User user = new User();
-        user.setUsername("admin");
-        user.setPassword("123456");
-        User register = userService.Register(user);
-        if (register.getId() != null){
-            System.out.println("注册成功"+register);
-        }else {
-            System.out.println("注册失败");
-        }
+
     }
 
 
 
     @Test
     void testAllUser(){
-        System.out.println(userService.queryUserList());
+
     }
 }

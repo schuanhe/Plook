@@ -1,146 +1,99 @@
 package com.schuanhe.Plook.controller;
 
-import com.schuanhe.Plook.service.SocketService;
+import com.alibaba.fastjson.JSON;
+import com.schuanhe.Plook.entity.RoomFrom;
 import com.schuanhe.Plook.utils.CurPool;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import javax.websocket.OnClose;
-import javax.websocket.OnMessage;
-import javax.websocket.OnOpen;
-import javax.websocket.Session;
+import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.Base64;
 
 
 @Slf4j
 @Component
-@ServerEndpoint("/websocket/{name}")
+@ServerEndpoint("/websocket/{rooId}/{userId}")
 //此注解相当于设置访问URL
 public class WebSocket {
-
 
     /**
      *  与某个客户端的连接对话，需要通过它来给客户端发送消息
      */
     public Session session;
-    /**
-     * 标识当前连接客户端的用户名
-     */
-    public String name;
+
+    public Integer rid;
+
+    public String uid;
+
+    // 关闭理由
+    public String reason = "链接关闭";
 
 
     @OnOpen
-    public void onOpen(Session session, @PathParam(value="name")String name) {
+    public void onOpen(Session session, @PathParam(value="roomId")Integer roomId, @PathParam(value="userId")String userId) {
         this.session = session;
-        this.name = name;
-        CurPool.webSockets.put(name,this);
-        log.info("[链接成功]name={} socket={} 数量:{}",name,this,CurPool.webSockets.size());
-
-        Map<String, Object> map = SocketService.onOpen(name);
-        sendMassageList(map);
-
+        this.rid = roomId;
+        this.uid = userId;
+        if (uid == null || "".equals(uid) || rid == null || rid <= 0) {
+            this.reason = "链接信息不完全";
+            onClose();
+            return;
+        }
+        RoomFrom roomFrom = CurPool.roomFromList.get(rid);
+        // 判断是否在房间里
+        if(roomFrom == null || !roomFrom.getRoomUser().containsKey(uid)) {
+            log.info("[链接失败]rid={} uid={} 你还没进入该房间",rid,uid);
+            this.reason = "你还没进入该房间";
+            onClose();
+            return;
+        }
+        // 加入链接数据
+        CurPool.roomFromList.get(rid).getUserSession().put(uid,session);
+        log.info("[链接成功]rid={} uid={} 当前房间人数={}",rid,uid,CurPool.roomFromList.get(rid).getUserSession().size());
     }
 
     @OnClose
     public void onClose() {
-        // 断开连接删除用户删除session
-        Map<String, Object> map = SocketService.onClose(this.name);
-        sendMassageList(map);
-        log.info("[断开连接]name={} session={} socket={} 数量:{}",name,session,this,CurPool.webSockets.size());
+        try {
+            // 设置关闭理由reason
+            CloseReason customCloseReason = new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE, reason);
+            // 去除用户数据
+            CurPool.roomFromList.get(rid).getUserSession().remove(uid);
+            session.close(customCloseReason);
+        } catch (Exception e) {
+            log.error("[断开连接]rid={} uid={} 当前房间人数={}",rid,uid,CurPool.roomFromList.get(rid).getUserSession().size());
+        }
+        log.info("[链接关闭]rid={} uid={} 当前房间人数={}",rid,uid,CurPool.roomFromList.get(rid).getUserSession().size());
     }
 
     @OnMessage
     public void onMessage(String message) {
-        Map<String, Object> map = SocketService.onMessage(message);
-        sendMassageList(map);
-        log.info("[收到客户端消息]name={} message={} map={} 数量:{}",name,message,map,CurPool.webSockets.size());
+        sendMessage(rid,uid,message);
+        log.info("[收到消息] rid={} uid={} message={}",rid,uid,message);
     }
 
-    //发送消息
-    public void sendMassageList(Map<String, Object> sendMsg){
 
-        //for (Object name : (List) sendMsg.get("names")) {
-        //    if(sendMsg.containsKey("ownerId")){
-        //        //list包括消息发送者
-        //        if(!sendMsg.get("ownerId").equals(name)){
-        //            //不是消息发送者
-        //            sendMassage(name.toString(),sendMsg.get("data").toString());
-        //        }else {
-        //            //本次是消息发送者
-        //            System.out.println("跳过本次发送");
-        //        }
-        //    }else {
-        //        //list不包括消息发送者
-        //        sendMassage(name.toString(),sendMsg.get("data").toString());
-        //    }
-        //}
-
-        //判断是否为空
-        if (Objects.isNull(sendMsg)||sendMsg.isEmpty()){
-            return;
-        }
-        log.info("发送消息:{}",sendMsg);
-        ((List<?>) sendMsg.get("names")).stream()
-                .filter(name -> !sendMsg.containsKey("ownerId") || !sendMsg.get("ownerId").equals(name))
-                .forEach(name -> sendMassage(name.toString(), sendMsg.get("data").toString()));
-    }
-
-    //发送消息
-    public void sendMassage(String name,String message){
-        if (!CurPool.webSockets.containsKey(name)) {
-            return;
-        }
-        Session session = CurPool.webSockets.get(name).session;
-        if (session != null) {
-            try {
-                session.getAsyncRemote().sendText(message);
-            } catch (Exception e) {
-                e.printStackTrace();
+    public static void sendMessage(Integer rid, String uid, String message) {
+        CurPool.roomFromList.get(rid).getUserSession().forEach((k,v)->{
+            System.out.println("k:"+k+"uid:"+uid);
+            if (!k.equals(uid)) {
+                v.getAsyncRemote().sendText(message);
             }
-        }
+        });
+        log.info("[发送消息]rid={} uid={} message={} size={}",rid,uid,message,CurPool.roomFromList.get(rid).getUserSession().size()-1);
     }
 
-
-    // 此为广播消息
-//    public void sendAllMessage(String message) {
-//        for(WebSocket webSocket : webSockets) {
-//            System.out.println("【websocket消息】广播消息:"+message);
-//            try {
-//                webSocket.session.getAsyncRemote().sendText(message);
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        }
-//    }
-
-    // 此为单点消息 (发送文本)
-//    public void sendTextMessage(Integer userId, String message) {
-//        Session session = (Session)CurPool.sessionPool.get(userId).get(1);
-//        if (session != null) {
-//            try {
-//                session.getAsyncRemote().sendText(message);
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        }
-//    }
-
-    // 此为单点消息 (发送对象)
-//    public void sendObjMessage(String sessionId, Object message) {
-//        Session session = CurPool.sessionPool.get(sessionId);
-//        if (session != null) {
-//            try {
-////                session.getAsyncRemote().sendObject(message);
-//                session.getBasicRemote().sendText(JsonUtils.objectToJson(message));
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        }
-//    }
+    public static <T> void sendObject(Integer rid, Integer uid, T message) {
+        CurPool.roomFromList.get(rid).getUserSession().forEach((k,v)->{
+            if (!k.equals(uid)) {
+                String encode = Base64.getEncoder().encodeToString(JSON.toJSONString(message).getBytes());
+                v.getAsyncRemote().sendText(encode);
+            }
+        });
+        log.info("[发送消息]rid={} uid={} message={}",rid,uid,message);
+    }
 
 }
