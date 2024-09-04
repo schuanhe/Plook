@@ -6,9 +6,8 @@ export const useRoomStore = defineStore({
         roomMsgList: []
     }),
     actions: {
-        // 新增msg
         addMsg(msg) {
-            this.roomMsgList.push(msg);
+                this.roomMsgList.push(msg);
         },
         clearMsg() {
             this.roomMsgList = [];

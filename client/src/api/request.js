@@ -9,12 +9,12 @@ const baseURL = config.baseUrl ? `http${config.https ? 's' : ''}://${config.base
 export function request(options) {
     return new Promise((resolve, reject) => {
         uni.request({
-            url: baseURL + options.url + '/api/',
-            header: {
-                Authorization: useUserStore().getToken() ? `${useUserStore().getToken()}` : '',
-                ...options.header
-            },
             ...options,
+            url: baseURL + '/api/' + options.url ,
+            header: {
+                ...options.header,
+                Authorization: useUserStore().getToken() ? `${useUserStore().getToken()}` : '',
+            },
             success: (res) => {
                 resolve(res);
             },

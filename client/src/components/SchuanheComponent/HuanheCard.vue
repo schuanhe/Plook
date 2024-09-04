@@ -2,11 +2,11 @@
   <view>
     <view class="card-container">
       <view class="card-content">
-        <view class="card-title">
+        <view v-if="title" class="card-title">
           <text>{{title}}</text>
         </view>
 <!--        下划线-->
-        <view class="card-line"></view>
+        <view v-if="title" class="card-line"></view>
         <view class="card-body">
           <slot></slot>
         </view>
@@ -19,7 +19,7 @@ defineProps({
   title: {
     type: String,
     required: true
-  }
+  },
 });
 </script>
 
