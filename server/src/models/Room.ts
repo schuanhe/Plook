@@ -7,6 +7,7 @@ class RoomModel extends Model {
     id!: number;
     userId!: number;
     roomName!: string;
+    isVisible!: boolean;
     password: string|undefined;
     roomVideoUrl!: string;
 }
@@ -33,8 +34,26 @@ let Room = RoomModel.init({
         type: DataTypes.STRING,
         allowNull: false
     },
+    isVisible: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: true
+    },
+    password: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    // 数据库没有的字段
+    isPassword: {
+        type: DataTypes.VIRTUAL,
+        get() {
+            return this.password !== null;
+        }
+    }
+
 }, {
     sequelize,
+    underscored: true,
     modelName: 'Room',
     tableName: 'Rooms'
 })

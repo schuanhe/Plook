@@ -39,8 +39,8 @@ class RoomController implements IRoomController {
     }
 
     getRoomList(req: e.Request, res: e.Response): void {
-        let reqUser:UserModel = req.body;
-        roomService.getRoomList(reqUser).then(r =>
+        let reqUserId:number = req.body.jwtUserId;
+        roomService.getRoomList(reqUserId).then(r =>
             res.status(200).send(ApiResponse.success(r))
         ).catch(err => {
             res.status(500).send(ApiResponse.error(err))

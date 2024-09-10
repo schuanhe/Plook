@@ -1,7 +1,7 @@
 
 // 设置接口
 import {RoomModel} from "../models/Room";
-import {RoomUserModel} from "../models/associations/RoomUser"
+import {RoomUserModel} from "../models/associations/RoomUserModel"
 import {UserModel} from "../models/User";
 
 export interface IRoomService {
@@ -19,7 +19,12 @@ export interface IRoomService {
     /**
      * 获取房间列表（可见）
      */
-    getRoomList(user: UserModel): Promise<RoomModel[]>;
+    getRoomList(userId: number): Promise<RoomModel[]>;
+
+    /**
+     * 获取房间列表（可见）
+     */
+    getMyRoomList(userId: number): Promise<RoomModel[]>;
 
     /**
      * 加入房间

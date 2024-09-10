@@ -4,8 +4,9 @@ import authMiddleware from '../utils/authMiddleware';
 
 const router = express.Router();
 
-router.post('/',authMiddleware, roomController.createRoom);
 router.get('/', authMiddleware, roomController.getRoomList);
-router.get('/:id', authMiddleware, roomController.getRoomInfo);
+// router.post('/',authMiddleware, roomController.createRoom);
+
+// router.get('/:id', authMiddleware, roomController.getRoomInfo);
 
 export default router;

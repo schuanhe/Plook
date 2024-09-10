@@ -12,7 +12,7 @@ class RoomUserModel extends Model {
 }
 
 
-const RoomUser = RoomUserModel.init({
+let RoomUser = RoomUserModel.init({
     id: {
         type: DataTypes.INTEGER,
         primaryKey: true,

@@ -16,6 +16,9 @@ export class ApiResponse {
     static error(message: string) {
         return new ApiResponse(500, message, null);
     }
+    static custom(code: number, message: string){
+        return new ApiResponse(code, message, null);
+    }
     static badRequest(message: string) {
         return new ApiResponse(400, message, null);
     }

@@ -20,6 +20,10 @@ import UniFormsItem from "../../uni_modules/uni-forms/components/uni-forms-item/
 import UniEasyinput from "../../uni_modules/uni-easyinput/components/uni-easyinput/uni-easyinput.vue";
 import { useUserStore } from "../../store/user";
 import { login } from "../../api/user";
+import {onLoad} from "@dcloudio/uni-app";
+
+
+
 
 const useUserStoreA = useUserStore()
 const form = {
@@ -39,18 +43,29 @@ const rules = {
   }
 }
 
+let isTo = false
+
+
+onLoad((options) => {
+  isTo = options.isTo
+})
+
+
 const loginFun = () => {
   login(form).then(res => {
-    if(res.data.code === 200) {
+    if(res.code === 200) {
       useUserStoreA.setToken(res.data.token)
       useUserStoreA.setUser(res.data.user)
-      uni.navigateTo({
-        url: '/pages/PlookRoom/PlookRoom'
-      })
+      if (isTo){
+        uni.navigateBack()
+      }else {
+        uni.navigateTo({
+          url: '../roomList/index'
+        })
+      }
     } else {
-      console.log(res.code)
       uni.showToast({
-        title: res.data.message,
+        title: res.message,
         icon: 'none'
       })
     }

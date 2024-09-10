@@ -1,18 +1,33 @@
 <template>
   <view class="container">
+    <uni-card title="房间选择">
+      <view class="room-select">
+          <view>
+            <uni-data-checklist @change="filterRooms" v-model="checkbox1" :localdata="selectConditions">  </uni-data-checklist>
+          </view>
+      </view>
+    </uni-card>
     <uni-card title="房间列表">
       <scroll-view class="room-list" scroll-y="true">
         <view class="room-container">
-          <uni-card class="room-item" >
-            <view> 创建新房间 </view>
-            <button size="mini" class="room-button">创建</button>
+          <uni-card class="room-item">
+            <view class="room-item-view" >
+              <text class="add-room-item"> 创建房间 </text>
+              <button size="mini" type="default" class="room-button"> 创建 </button>
+            </view>
           </uni-card>
-          <view v-if="rooms.length === 0" class="empty-list">
+          <view v-if="filteredRooms.length === 0" class="empty-list">
             <text>暂无房间</text>
           </view>
-          <uni-card class="room-item" v-for="room in rooms" :key="room.id">
-            <view>{{ room.name }}</view>
-            <button size="mini" type="primary" class="room-button">{{ room.buttonText }}</button>
+          <uni-card class="room-item" v-for="room in filteredRooms" :key="room.id">
+            <view class="room-item-view" >
+              <text style="font-weight: bold; height: 80px; ">{{ room.roomName }}</text>
+              <view class="room-tag">
+                <uni-tag size="mini" :text="room.isPassword ? '有密码' : '无密码'" :type="room.isPassword ? 'primary' : 'default'"/>
+                <uni-tag size="mini" :text="room.isInRoom ? '已加入' : '未加入'" :type="room.isInRoom ? 'success' : 'default'"/>
+              </view>
+              <button size="mini" type="primary" class="room-button"> 加入 </button>
+            </view>
           </uni-card>
         </view>
       </scroll-view>
@@ -24,22 +39,104 @@
 import { ref,onMounted } from 'vue';
 import UniCard from "../../uni_modules/uni-card/components/uni-card/uni-card.vue";
 import { getRoomList } from "../../api/room";
+import UniDataChecklist from "../../uni_modules/uni-data-checkbox/components/uni-data-checkbox/uni-data-checkbox.vue";
+import UniEasyinput from "../../uni_modules/uni-easyinput/components/uni-easyinput/uni-easyinput.vue";
+import UniFab from "../../uni_modules/uni-fab/components/uni-fab/uni-fab.vue";
+import UniTag from "../../uni_modules/uni-tag/components/uni-tag/uni-tag.vue";
 // 示例数据
 const rooms = ref([
-  { id: 1, name: '房间1', buttonText: '进入' },
-  { id: 2, name: '房间2', buttonText: '进入' },
-  { id: 1, name: '房间1', buttonText: '进入' },
-  { id: 2, name: '房间2', buttonText: '进入' },
-  { id: 1, name: '房间1', buttonText: '进入' },
-  { id: 2, name: '房间2', buttonText: '进入' },
-  { id: 1, name: '房间1', buttonText: '进入' },
-  { id: 2, name: '房间2', buttonText: '进入' },
-  // { id: 1, name: '房间1', buttonText: '进入' },
-  // { id: 2, name: '房间2', buttonText: '进入' },
-  // { id: 1, name: '房间1', buttonText: '进入' },
-  // { id: 2, name: '房间2', buttonText: '进入' },
-  // 可继续添加房间
+  {
+    "isPassword": false,
+    "id": 1,
+    "userId": 1,
+    "roomName": "不带密码公开加入",
+    "roomVideoUrl": "https://baidu.com",
+    "isVisible": true,
+    "password": null,
+    "createdAt": "2024-06-12T09:43:10.000Z",
+    "updatedAt": "2024-06-12T09:43:10.000Z",
+    "isInRoom": 1
+  },
+  {
+    "isPassword": true,
+    "id": 2,
+    "userId": 1,
+    "roomName": "带密码隐藏加入",
+    "roomVideoUrl": "https://baidu.com",
+    "isVisible": false,
+    "password": "212",
+    "createdAt": "2024-06-12T09:49:43.000Z",
+    "updatedAt": "2024-06-12T09:49:43.000Z",
+    "isInRoom": 1
+  },
+  {
+    "isPassword": false,
+    "id": 4,
+    "userId": 1,
+    "roomName": "不带密码隐藏加入",
+    "roomVideoUrl": "https://baidu.com",
+    "isVisible": false,
+    "password": null,
+    "createdAt": "2024-06-13T01:36:54.000Z",
+    "updatedAt": "2024-06-13T01:36:54.000Z",
+    "isInRoom": 1
+  },
+  {
+    "isPassword": true,
+    "id": 8,
+    "userId": 2,
+    "roomName": "带密码公开",
+    "roomVideoUrl": "https://baidu.com",
+    "isVisible": true,
+    "createdAt": "2024-09-05T15:00:16.000Z",
+    "updatedAt": "2024-09-05T15:00:18.000Z",
+    "isInRoom": 0
+  },
+  {
+    "isPassword": true,
+    "id": 9,
+    "userId": 2,
+    "roomName": "不带密码公开",
+    "roomVideoUrl": "https://baidu.com",
+    "isVisible": true,
+    "createdAt": "2024-09-05T15:00:48.000Z",
+    "updatedAt": "2024-09-05T15:00:51.000Z",
+    "isInRoom": 0
+  }
 ]);
+// rooms实际显示数据
+const filteredRooms = ref([]);
+
+// 选择条件
+const selectConditions = ref([
+  {
+    text: '全部',
+    value: 'all'
+  },
+  {
+    text: '公开',
+    value: 'public'
+  },
+  {
+    text: '已加入',
+    value: 'join'
+  },
+]);
+
+const checkbox1 = ref([])
+
+// 选择后过滤房间列表
+function filterRooms(condition) {
+  if (condition === 'all') {
+    return rooms.value;
+  } else if (condition === 'public') {
+    return rooms.value.filter(room => room.isPublic);
+  } else if (condition === 'join') {
+    return rooms.value.filter(room => room.isJoined);
+  } else if (condition === 'unJoined') {
+    return rooms.value.filter(room => !room.isJoined);
+  }
+}
 
 // 新建房间
 function createRoom() {
@@ -57,12 +154,13 @@ function joinRoom(room) {
 // 获取房间列表
 async function fetchRoomList() {
   getRoomList().then(res => {
-    if (res.data === 200){
-      rooms.value = res.data.data;
+    if (res.code === 200){
+      rooms.value = res.data;
+      filteredRooms.value = rooms.value;
     }else {
-      console.log("获取房间列表失败");
+      console.log("获取房间列表失败",res.code);
       uni.showToast({
-        title: res.data.message,
+        title: res.message,
         icon: 'none'
       })
     }
@@ -79,10 +177,16 @@ onMounted(() => {
 <style scoped>
 .container {
   display: flex;
-  justify-content: center;
-  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  flex-direction:column;
   width: 100%;
   height: 100%;
+}
+
+.room-select {
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .room-list {
@@ -101,13 +205,20 @@ onMounted(() => {
   margin: 5px;
   box-sizing: border-box;
   width: 150px;
-  min-width: 120px;
+  min-width: 130px;
   max-width: 150px;
 
   height: 180px;
   min-height: 160px;
   max-height: 180px;
   flex-shrink: 0;
+}
+.room-item-view {
+  display: flex;
+  flex-direction: column;
+  /* 均匀y轴排列 */
+  justify-content: space-between;
+  align-items: stretch;
 }
 
 .empty-list {
@@ -116,5 +227,22 @@ onMounted(() => {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.room-button {
+  margin: 4px;
+}
+
+.room-tag {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.add-room-item {
+  display: grid;
+  place-items: center;
+  font-weight: bold;
+  height: 100px;           /* 容器的高度 */
 }
 </style>

@@ -12,7 +12,7 @@ import {request} from "./request";
  */
 export function login(data) {
     return request({
-        url: `login`,
+        url: `users/login`,
         method: 'POST',
         data: data
     });
@@ -21,6 +21,6 @@ export function login(data) {
 
 export function getUserInfo() {
     return request({
-        url: `user/info`,
+        url: `users/info`,
     });
 }

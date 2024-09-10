@@ -16,10 +16,19 @@ export function request(options) {
                 Authorization: useUserStore().getToken() ? `${useUserStore().getToken()}` : '',
             },
             success: (res) => {
-                resolve(res);
-            },
-            fail: (err) => {
-                reject(err);
+                if (res.statusCode === 200){
+                    resolve(res.data);
+                }else if (res.statusCode === 401) {
+                    uni.navigateTo({
+                        url: '/pages/user/login?isTo=true'
+                    })
+                }
+                else {
+                    uni.showToast({
+                        title: res.data['message'],
+                        icon: 'none'
+                    })
+                }
             }
         });
     });

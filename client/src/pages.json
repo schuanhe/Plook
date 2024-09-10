@@ -1,6 +1,13 @@
 {
   "pages": [
     {
+      "path": "pages/user/login",
+      "style": {
+        "navigationBarTitleText": "登录",
+        "enablePullDownRefresh": false
+      }
+    },
+    {
       "path": "pages/roomList/index",
       "style": {
         "navigationBarTitleText": "选择房间",
