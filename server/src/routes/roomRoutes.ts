@@ -5,7 +5,7 @@ import authMiddleware from '../utils/authMiddleware';
 const router = express.Router();
 
 router.get('/', authMiddleware, roomController.getRoomList);
-// router.post('/',authMiddleware, roomController.createRoom);
+router.post('/',authMiddleware, roomController.createRoom);
 
 // router.get('/:id', authMiddleware, roomController.getRoomInfo);
 

@@ -9,21 +9,16 @@ import {UserModel} from "../../models/User";
 
 class RoomController implements IRoomController {
     createRoom(req: e.Request, res: e.Response): void {
-        let newRoom:RoomModel = req.body;
-        if (newRoom.userId != req.body.jwtUserId){
-            console.log(req.body.jwtUserId.toString())
-            res.status(400).send(ApiResponse.badRequest("用户id不匹配"))
-            return;
-        }
-        roomService.addRoom(newRoom).then(r =>
-        {
-            if (r == null)
-                res.status(400).send(ApiResponse.badRequest("房间创建失败"))
-            res.status(200).send(ApiResponse.success(r))
-        }
+        let newRoom: RoomModel = req.body;
+        newRoom.userId = Number(req.body.jwtUserId);
 
+        roomService.addRoom(newRoom).then(r => {
+                if (r == null)
+                    res.status(400).send(ApiResponse.badRequest("房间创建失败"))
+                res.status(200).send(ApiResponse.success(r, "房间创建成功"))
+            }
         ).catch(err => {
-                res.status(500).send(ApiResponse.error(err.message))
+            res.status(500).send(ApiResponse.error(err))
         })
     }
 

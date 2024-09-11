@@ -19,6 +19,7 @@ export function request(options) {
                 if (res.statusCode === 200){
                     resolve(res.data);
                 }else if (res.statusCode === 401) {
+                    useUserStore().clearUser();
                     uni.navigateTo({
                         url: '/pages/user/login?isTo=true'
                     })

@@ -12,7 +12,8 @@ class RoomService implements IRoomService {
             roomName: room.roomName,
             roomVideoUrl: room.roomVideoUrl,
             userId: room.userId,
-            password: room.password
+            password: room.password,
+            isVisible: room.isVisible,
         })
         if (!newRoom)
             return Promise.reject("创建房间失败");

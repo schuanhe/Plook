@@ -21,6 +21,7 @@ import UniEasyinput from "../../uni_modules/uni-easyinput/components/uni-easyinp
 import { useUserStore } from "../../store/user";
 import { login } from "../../api/user";
 import {onLoad} from "@dcloudio/uni-app";
+import { onMounted } from "vue";
 
 
 
@@ -71,6 +72,16 @@ const loginFun = () => {
     }
   })
 }
+
+onMounted(() => {
+  // 检查是否有token
+  const token = useUserStoreA.getToken()
+  if (token) {
+    uni.redirectTo({
+      url: '../roomList/index'
+    })
+  }
+})
 
 </script>
 <style scoped>

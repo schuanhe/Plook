@@ -8,7 +8,7 @@ class RoomModel extends Model {
     userId!: number;
     roomName!: string;
     isVisible!: boolean;
-    password: string|undefined;
+    password!: string;
     roomVideoUrl!: string;
 }
 
@@ -47,7 +47,7 @@ let Room = RoomModel.init({
     isPassword: {
         type: DataTypes.VIRTUAL,
         get() {
-            return this.password !== null;
+            return !!this.password;
         }
     }
 

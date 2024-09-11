@@ -10,8 +10,8 @@ export class ApiResponse {
         this.message = message;
         this.data = data;
     }
-    static success(data: any) {
-        return new ApiResponse(200, 'Success', data);
+    static success(data: any,message?: string) {
+        return new ApiResponse(200, !message ? "success" : message, data);
     }
     static error(message: string) {
         return new ApiResponse(500, message, null);

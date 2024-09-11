@@ -31,6 +31,11 @@
         "navigationBarTitleText": "房间",
         "enablePullDownRefresh": false
       }
+    },{
+      "path": "pages/roomList/addRoom",
+      "style": {
+        "navigationBarTitleText": "新增房间"
+      }
     }
   ],
   "globalStyle": {

@@ -13,7 +13,7 @@
           <uni-card class="room-item">
             <view class="room-item-view" >
               <text class="add-room-item"> 创建房间 </text>
-              <button size="mini" type="default" class="room-button"> 创建 </button>
+              <button size="mini" @click="createRoom"  type="default" class="room-button"> 创建 </button>
             </view>
           </uni-card>
           <view v-if="filteredRooms.length === 0" class="empty-list">
@@ -36,13 +36,14 @@
 </template>
 
 <script setup>
-import { ref,onMounted } from 'vue';
+import { ref } from 'vue';
 import UniCard from "../../uni_modules/uni-card/components/uni-card/uni-card.vue";
 import { getRoomList } from "../../api/room";
 import UniDataChecklist from "../../uni_modules/uni-data-checkbox/components/uni-data-checkbox/uni-data-checkbox.vue";
 import UniEasyinput from "../../uni_modules/uni-easyinput/components/uni-easyinput/uni-easyinput.vue";
 import UniFab from "../../uni_modules/uni-fab/components/uni-fab/uni-fab.vue";
 import UniTag from "../../uni_modules/uni-tag/components/uni-tag/uni-tag.vue";
+import {onShow} from "@dcloudio/uni-app";
 // 示例数据
 const rooms = ref([
   {
@@ -141,7 +142,7 @@ function filterRooms(condition) {
 // 新建房间
 function createRoom() {
   uni.navigateTo({
-    url: '/pages/createRoom/createRoom'
+    url: '/pages/roomList/addRoom'
   })
 }
 // 加入房间
@@ -167,8 +168,13 @@ async function fetchRoomList() {
   })
 }
 
-// 页面加载时
-onMounted(() => {
+// // 页面加载时
+// onMounted(() => {
+//   fetchRoomList();
+// })
+
+// 每次回到该页面时
+onShow(() => {
   fetchRoomList();
 })
 
