@@ -43,7 +43,7 @@ class RoomController implements IRoomController {
     }
 
     joinRoom(req: e.Request, res: e.Response): void {
-        let reqUserId:number = req.body.jwtUserId;
+        let reqUserId:number = Number(req.body.jwtUserId);
         let reqRoom:RoomModel = req.body;
         roomService.joinRoom(reqRoom, reqUserId).then(r =>
             res.status(200).send(ApiResponse.success(r))

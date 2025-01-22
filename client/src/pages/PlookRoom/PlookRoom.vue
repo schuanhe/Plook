@@ -11,8 +11,8 @@
         <plook-video class=""/>
       </view>
       <view class=" uni-flex uni-column" >
-        <text class="flex-item">当前房间号: 123456789 \n</text>
-        <text class="flex-item">666</text></view>
+        <text class="flex-item">当前房间号: {{ roomId }} \n</text>
+        <text class="flex-item">{{ roomInfo }}</text></view>
     </view>
 
     <view class="comments-container video-card video-card-min">
@@ -23,12 +23,12 @@
   <view class="set-video" @click="showSetRoom = !showSetRoom" v-show="showSetRoom.valueOf()">
     <view class="set-imt video-card" @click.stop>
       <uni-forms ref="validForm" :rules="rules" :modelValue="roomData" style="padding: 10px">
-      <uni-forms-item label="名称" required name="name">
-        <uni-easyinput v-model="roomData.name" placeholder="请输入房间名称" />
-      </uni-forms-item>
-      <uni-forms-item label="链接" required name="url">
-        <uni-easyinput v-model="roomData.url" placeholder="请输入房间链接" />
-      </uni-forms-item>
+        <uni-forms-item label="名称" required name="name">
+          <uni-easyinput v-model="roomData.name" placeholder="请输入房间名称" />
+        </uni-forms-item>
+        <uni-forms-item label="链接" required name="url">
+          <uni-easyinput v-model="roomData.url" placeholder="请输入房间链接" />
+        </uni-forms-item>
       </uni-forms>
       <button :type="'primary'" style="width: 50%" size="mini" @click="submit">提交</button>
       <button :type="'default'" style="width: 50%; margin-top: 10px" size="mini" @click="showSetRoom = !showSetRoom">取消</button>
@@ -40,7 +40,7 @@
 
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import PlookVideo from "../../components/PlookVideo.vue";
 import MessageContainer from "../../components/PlookChat/MessageContainer/Index.vue";
 import UniCard from "../../uni_modules/uni-card/components/uni-card/uni-card.vue";
@@ -134,6 +134,29 @@ const submit = () => {
   //   }
   // }))
 }
+
+const roomId = ref(null);
+const roomInfo = ref('');
+
+onMounted(() => {
+  const query = uni.createSelectorQuery().select('.container').boundingClientRect(data => {
+    roomId.value = data.dataset.roomId;
+    fetchRoomInfo();
+  }).exec();
+});
+
+const fetchRoomInfo = () => {
+  socketIo.start();
+  socketIo.send(socketMessage.sendRoomInfo({
+    type: 'getRoomInfo',
+    data: {
+      roomId: roomId.value,
+    }
+  }));
+  socketIo.getSocket().on('roomInfo', (message) => {
+    roomInfo.value = message.data;
+  });
+};
 
 </script>
 

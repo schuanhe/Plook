@@ -14,7 +14,10 @@ export default {
       title: 'Hello',
     }
   },
-  onLoad() {},
+  onLoad() {
+    plus.sqlite
+
+  },
   methods: {},
 }
 </script>

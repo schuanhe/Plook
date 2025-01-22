@@ -2,9 +2,9 @@
   <view class="container">
     <uni-card title="房间选择">
       <view class="room-select">
-          <view>
-            <uni-data-checklist @change="filterRooms" v-model="checkbox1" :localdata="selectConditions">  </uni-data-checklist>
-          </view>
+        <view>
+          <uni-data-checklist @change="filterRooms" v-model="checkbox1" :localdata="selectConditions">  </uni-data-checklist>
+        </view>
       </view>
     </uni-card>
     <uni-card title="房间列表">
@@ -26,23 +26,31 @@
                 <uni-tag size="mini" :text="room.isPassword ? '有密码' : '无密码'" :type="room.isPassword ? 'primary' : 'default'"/>
                 <uni-tag size="mini" :text="room.isInRoom ? '已加入' : '未加入'" :type="room.isInRoom ? 'success' : 'default'"/>
               </view>
-              <button size="mini" type="primary" class="room-button"> 加入 </button>
+              <button size="mini" type="primary" class="room-button" @click="joinRoomHandler(room)"> 加入 </button>
             </view>
           </uni-card>
         </view>
       </scroll-view>
     </uni-card>
+    <uni-popup ref="passwordPopup" type="dialog">
+      <view class="password-popup">
+        <text>请输入房间密码</text>
+        <uni-easyinput v-model="password" placeholder="请输入密码" />
+        <button size="mini" type="primary" @click="confirmPassword">确认</button>
+      </view>
+    </uni-popup>
   </view>
 </template>
 
 <script setup>
 import { ref } from 'vue';
 import UniCard from "../../uni_modules/uni-card/components/uni-card/uni-card.vue";
-import { getRoomList } from "../../api/room";
+import { getRoomList, joinRoom } from "../../api/room";
 import UniDataChecklist from "../../uni_modules/uni-data-checkbox/components/uni-data-checkbox/uni-data-checkbox.vue";
 import UniEasyinput from "../../uni_modules/uni-easyinput/components/uni-easyinput/uni-easyinput.vue";
 import UniFab from "../../uni_modules/uni-fab/components/uni-fab/uni-fab.vue";
 import UniTag from "../../uni_modules/uni-tag/components/uni-tag/uni-tag.vue";
+import UniPopup from "../../uni_modules/uni-popup/components/uni-popup/uni-popup.vue";
 import {onShow} from "@dcloudio/uni-app";
 // 示例数据
 const rooms = ref([
@@ -145,21 +153,62 @@ function createRoom() {
     url: '/pages/roomList/addRoom'
   })
 }
+
+const password = ref('');
+const selectedRoom = ref(null);
+const passwordPopup = ref(false);
+
 // 加入房间
-function joinRoom(room) {
-  uni.navigateTo({
-    url: '/pages/lookRoom/lookRoom?roomId=' + room.id
-  })
+async function joinRoomHandler(room) {
+  if (room.isPassword) {
+    selectedRoom.value = room;
+    password.value = '';
+    passwordPopup.value.open();
+  } else {
+    const res = await joinRoom(room.id);
+    if (res.code === 200) {
+      uni.navigateTo({
+        url: '/pages/PlookRoom/PlookRoom?roomId=' + room.id
+      });
+    } else {
+      uni.showToast({
+        title: res.message,
+        icon: 'none'
+      });
+    }
+  }
+}
+
+async function confirmPassword() {
+  if (selectedRoom.value && password.value === selectedRoom.value.password) {
+    const res = await joinRoom(selectedRoom.value.id);
+    if (res.code === 200) {
+      uni.navigateTo({
+        url: '/pages/PlookRoom/PlookRoom?roomId=' + selectedRoom.value.id
+      });
+    } else {
+      await uni.showToast({
+        title: res.message,
+        icon: 'none'
+      });
+    }
+    passwordPopup.value.close();
+  } else {
+    uni.showToast({
+      title: '密码错误',
+      icon: 'none'
+    });
+  }
 }
 
 // 获取房间列表
 async function fetchRoomList() {
   getRoomList().then(res => {
-    if (res.code === 200){
+    if (res.code === 200) {
       rooms.value = res.data;
       filteredRooms.value = rooms.value;
-    }else {
-      console.log("获取房间列表失败",res.code);
+    } else {
+      console.log("获取房间列表失败", res.code);
       uni.showToast({
         title: res.message,
         icon: 'none'
@@ -185,7 +234,7 @@ onShow(() => {
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-start;
-  flex-direction:column;
+  flex-direction: column;
   width: 100%;
   height: 100%;
 }
@@ -219,6 +268,7 @@ onShow(() => {
   max-height: 180px;
   flex-shrink: 0;
 }
+
 .room-item-view {
   display: flex;
   flex-direction: column;
@@ -249,6 +299,14 @@ onShow(() => {
   display: grid;
   place-items: center;
   font-weight: bold;
-  height: 100px;           /* 容器的高度 */
+  height: 100px; /* 容器的高度 */
+}
+
+.password-popup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
 }
 </style>

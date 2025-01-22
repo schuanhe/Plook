@@ -16,3 +16,12 @@ export function createRoom(data) {
         data,
     });
 }
+
+// 加入房间
+export function joinRoom(id) {
+    return request({
+        url: `rooms/join`,
+        method: "POST",
+        data: { id },
+    });
+}
