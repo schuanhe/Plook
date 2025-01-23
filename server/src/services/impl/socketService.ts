@@ -1,4 +1,3 @@
-
 import type {Server, Socket} from "socket.io";
 
 import { roomService } from "./roomService";
@@ -21,24 +20,40 @@ export class SocketService {
     // ROOM_INFO 事件处理
 
     public joinRoom(message: SocketMessage) {
-        console.log('joinRoom', message)
-        const {roomId} = message.data;
-        if (!roomId){
-            console.log('房间号不能为空');
+        const {roomId,userName} = message.data;
+        if (!roomId) {
             this.socket.emit(SocketEvent.ERROR, '房间号不能为空');
+            return;
         }
         this.socket.join(String(roomId));
-        this.socket.emit(SocketEvent.ROOM_INFO, '加入房间成功');
+
+        // 发送系统消息
+        this.socket.to(String(roomId)).emit('setRoomInfo', {
+            type: 'setRoomInfo',
+            data: {
+                messageType: 'system',
+                content: `用户${userName || '匿名用户'}加入房间`
+            }
+        });
     }
 
     public leaveRoom(message: SocketMessage) {
-        const {roomId} = message.data;
-        if (!roomId){
-            console.log('房间号不能为空');
+        const {roomId,userName} = message.data;
+        if (!roomId) {
             this.socket.emit(SocketEvent.ERROR, '房间号不能为空');
+            return;
         }
+
+        // 发送系统消息
+        this.socket.to(String(roomId)).emit('setRoomInfo', {
+            type: 'setRoomInfo',
+            data: {
+                messageType: 'system',
+                content: `用户${userName || '匿名用户'}离开房间`
+            }
+        });
+
         this.socket.leave(String(roomId));
-        console.log(`${this.socket.id} 离开房间 ${roomId}`);
     }
 
     public getRoomInfo(message: SocketMessage, io: Server) {
@@ -99,10 +114,53 @@ export class SocketService {
     }
 
 
-    public setRoomInfo(socketMessage: socketVideoInfoType, io: Server){
-        const { roomId, messageInfo, video } = socketMessage.data;
-        if (this.checkMessageInfo(messageInfo, io)){
-            io.to(messageInfo.sendSocketId).emit(SocketEvent.ROOM_INFO, socketMessage);
+    public setRoomInfo(socketMessage: SocketMessage, io: Server) {
+        const { roomId, messageType, message, danmu } = socketMessage.data;
+
+        // 验证用户是否在房间中
+        const roomSockets = io.sockets.adapter.rooms.get(String(roomId));
+        if (!roomSockets || !roomSockets.has(this.socket.id)) {
+            this.socket.emit(SocketEvent.ERROR, '未加入该房间');
+            return;
+        }
+
+        switch (messageType) {
+            case 'message':
+                // 广播消息给房间内所有用户（包括发送者）
+                io.to(String(roomId)).emit('setRoomInfo', {
+                    type: 'setRoomInfo',
+                    data: {
+                        messageType: 'message',
+                        message: {
+                            ...message,
+                            user: {
+                                userId: this.socket.data.userData.userId,
+                                userName: message.user.userName
+                            }
+                        }
+                    }
+                });
+                break;
+            case 'danmu':
+                // 广播弹幕
+                this.socket.to(String(roomId)).emit('setRoomInfo', {
+                    type: 'setRoomInfo',
+                    data: {
+                        messageType: 'danmu',
+                        danmu
+                    }
+                });
+                break;
+            case 'system':
+                // 广播系统消息
+                io.to(String(roomId)).emit('setRoomInfo', {
+                    type: 'setRoomInfo',
+                    data: {
+                        messageType: 'system',
+                        content: socketMessage.data.content
+                    }
+                });
+                break;
         }
     }
 
@@ -157,5 +215,28 @@ export class SocketService {
             return true;
         }
         return false;
+    }
+
+    // 处理视频操作事件
+    public handleVideoAction(message: SocketMessage, io: Server) {
+        const { roomId, action, currentTime, videoUrl } = message.data;
+
+        // 验证用户是否在房间中
+        const roomSockets = io.sockets.adapter.rooms.get(String(roomId));
+        if (!roomSockets || !roomSockets.has(this.socket.id)) {
+            this.socket.emit(SocketEvent.ERROR, '未加入该房间');
+            return;
+        }
+
+        // 广播视频操作给房间内其他用户
+        this.socket.to(String(roomId)).emit('videoAction', {
+            type: 'videoAction',
+            data: {
+                action,
+                currentTime,
+                videoUrl,
+                fromUserId: this.socket.data.userData.userId
+            }
+        });
     }
 }

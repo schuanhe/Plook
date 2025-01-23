@@ -1,85 +1,40 @@
 <template>
-  <div class="mes">
-    <span class="tips">{{user.name}}</span>
-    <div class="Bubble text" ref="bubbleRef" v-bind="other">
-      <p v-show="content">{{ content }}</p>
-    </div>
+  <div class="Bubble">
+    {{ content }}
   </div>
-
 </template>
 
 <script setup>
-import { ref, defineProps } from 'vue';
-
-const props = defineProps({
+defineProps({
   content: {
     type: String,
-    default: ''
+    required: true
   },
   user: {
     type: Object,
-    default: () => {
-      return {
-        name: '小明',
-        avatar: 'https://img.yzcdn.cn/vant/cat.jpeg'
-      };
-    }
+    default: () => ({})
   }
 });
-
-const bubbleRef = ref(null);
-const {content, ...other} = props;
 </script>
 
 <style scoped>
-.mes {
-  display: flex;
-  flex-direction: column;
-}
-
-.Message.right .mes{
-  align-items: flex-end;
-}
-
-.tips {
-  margin-bottom: 6px;
-  color: #666;
-  line-height: 1.1;
-  font-size: 12px;
-}
-
 .Bubble {
-  flex-direction: column; /* 添加这一行使子元素垂直排列 */
-  max-width: 300px; /* 示例变量值 */
-  /* min-width: 0; */
-  min-width: 1px; /* for IE bug */
-  background: #FFCCCC; /* 示例变量值 */
-  border-radius: 10px; /* 示例变量值 */
+  display: inline-block;
+  padding: 8px 12px;
+  border-radius: 4px;
+  background: #f5f5f5;
+  word-break: break-word;
+  font-size: 14px;
+  line-height: 1.4;
 }
 
-.Bubble.text{
-  min-width: 40px;
-  padding: 10px;
-  box-sizing: border-box;
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
+:deep(.Message.right) .Bubble {
+  background: #e1f3fb;
+  color: #333;
 }
 
-.Message.right .Bubble {
-  margin-left: 46px;
-  border-radius: 12px;
-  background: #99CCFF;
+:deep(.Message.left) .Bubble {
+  background: #f5f5f5;
+  color: #333;
 }
-
-
-.Message.left .Bubble {
-  margin-right:46px;
-}
-
-
-.Bubble p {
-  margin: 0;
-}
-
 </style>

@@ -165,15 +165,24 @@ async function joinRoomHandler(room) {
     password.value = '';
     passwordPopup.value.open();
   } else {
-    const res = await joinRoom(room.id);
-    if (res.code === 200) {
-      uni.navigateTo({
-        url: '/pages/PlookRoom/PlookRoom?roomId=' + room.id
-      });
-    } else {
+    try {
+      const res = await joinRoom(room.id);
+      if (res.code === 200) {
+        // 进入房间页面并传入房间ID
+        uni.navigateTo({
+          url: '/pages/PlookRoom/PlookRoom?roomId=' + room.id
+        });
+      } else {
+        uni.showToast({
+          title: res.message,
+          icon: 'none'
+        });
+      }
+    } catch (error) {
+      console.error('加入房间失败:', error);
       uni.showToast({
-        title: res.message,
-        icon: 'none'
+        title: '加入房间失败',
+        icon: 'none' 
       });
     }
   }

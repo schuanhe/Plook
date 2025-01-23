@@ -8,15 +8,15 @@
     </view>
     <view class="video-card" >
       <view class="video-container  ">
-        <plook-video class=""/>
+        <plook-video ref="videoRef"/>
       </view>
       <view class=" uni-flex uni-column" >
-        <text class="flex-item">当前房间号: {{ roomId }} \n</text>
+        <text class="flex-item">当前房间号: {{ currentRoomId }} \n</text>
         <text class="flex-item">{{ roomInfo }}</text></view>
     </view>
 
     <view class="comments-container video-card video-card-min">
-      <message-container />
+      <message-container v-if="videoRef" :video-ref="videoRef" />
     </view>
   </view>
 
@@ -40,7 +40,7 @@
 
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import PlookVideo from "../../components/PlookVideo.vue";
 import MessageContainer from "../../components/PlookChat/MessageContainer/Index.vue";
 import UniCard from "../../uni_modules/uni-card/components/uni-card/uni-card.vue";
@@ -50,8 +50,17 @@ import UniDrawer from "../../uni_modules/uni-drawer/components/uni-drawer/uni-dr
 import UniForms from "../../uni_modules/uni-forms/components/uni-forms/uni-forms.vue";
 import UniFormsItem from "../../uni_modules/uni-forms/components/uni-forms-item/uni-forms-item.vue";
 import UniEasyinput from "../../uni_modules/uni-easyinput/components/uni-easyinput/uni-easyinput.vue";
-import {socketIo, socketMessage,} from "../../utlis/socketIo"
+import {socketIo, socketMessage} from "../../utlis/socketIo"
 import { useRoomStore } from "../../store/room";
+import { onLoad } from '@dcloudio/uni-app';
+// 定义props
+const props = defineProps({
+  roomId: {
+    type: [String, Number],
+    default: ''
+  }
+});
+
 // 设置是否可见
 let showSetRoom = ref(false)
 
@@ -100,63 +109,108 @@ const trigger = (e) => {
   }
 }
 const roomStore = useRoomStore()
-const submit = () => {
-
-
-  const mockProps = {
-    _id: '123456789', // 字符串或数字
-    type: 'text', // 字符串
-    content: {
-      text: '测试长字符666666666踩踩踩66666踩踩踩66666踩踩踩66666踩踩踩66666踩踩踩66666踩踩踩踩踩从',
-    }, // 对象或字符串
-
-    user: {
-      id: 'user123', // 用户 ID
-      name: 'schuanhe', // 用户名
-      avatar: 'https://q1.qlogo.cn/g?b=qq&nk=3533767368&s=640' // 用户头像链接
-    },
-    position: 'left', // 字符串
-    hasTime: true, // 布尔值
-    status: {
-      read: true, // 是否已读
-      delivered: true // 是否已送达
-    },
-  };
-  roomStore.addMsg(mockProps)
-
-  // console.log('submit')
-  // socketIo.start()
-  // // 加入房间的请求
-  // socketIo.send(socketMessage.sendRoomInfo({
-  //   type: 'join',
-  //   data: {
-  //     roomId: "123456789",
-  //   }
-  // }))
-}
-
-const roomId = ref(null);
+const videoRef = ref(null);
+const currentRoomId = ref(null);
 const roomInfo = ref('');
 
-onMounted(() => {
-  const query = uni.createSelectorQuery().select('.container').boundingClientRect(data => {
-    roomId.value = data.dataset.roomId;
-    fetchRoomInfo();
-  }).exec();
+// socket连接状态
+const isSocketConnected = ref(false);
+
+// 更新视频源
+const updateVideoSource = (url) => {
+  videoRef.value?.changeVideoSource(url);
+};
+
+// 处理设置表单提交
+const submit = () => {
+  if (roomData.url) {
+    updateVideoSource(roomData.url);
+    showSetRoom.value = false;
+  }
+};
+
+// 连接socket并加入房间
+const connectSocket = async () => {
+  try {
+    if (!isSocketConnected.value) {
+      await socketIo.start();
+      isSocketConnected.value = true;
+    }
+
+    // 发送加入房间消息
+    socketIo.send(socketMessage.sendRoomInfo({
+      type: 'join',
+      data: {
+        roomId: currentRoomId.value,
+        userName: useRoomStore().getUserInfo().userName
+      }
+    }));
+
+    // 监听房间信息
+    socketIo.getSocket().on('roomInfo', (message) => {
+      roomInfo.value = message.data;
+    });
+
+    // 监听错误信息
+    socketIo.getSocket().on('error', (error) => {
+      uni.showToast({
+        title: error,
+        icon: 'none'
+      });
+    });
+
+    // 监听连接断开
+    socketIo.getSocket().on('disconnect', () => {
+      isSocketConnected.value = false;
+      reconnectSocket();
+    });
+
+  } catch (error) {
+    console.error('Socket连接失败:', error);
+    uni.showToast({
+      title: 'Socket连接失败，正在重试...',
+      icon: 'none'
+    });
+    setTimeout(reconnectSocket, 3000);
+  }
+};
+
+// 重连socket
+const reconnectSocket = async () => {
+  if (!isSocketConnected.value && currentRoomId.value) {
+    await connectSocket();
+  }
+};
+
+// 组件销毁时清理
+onBeforeUnmount(() => {
+  if (isSocketConnected.value && currentRoomId.value) {
+    try {
+      socketIo.send(socketMessage.sendRoomInfo({
+        type: 'leave',
+        data: {
+          roomId: currentRoomId.value,
+          userName: useRoomStore().getUserInfo().userName
+        }
+      }));
+      socketIo.getSocket()?.off('roomInfo');
+      socketIo.getSocket()?.off('error');
+      socketIo.getSocket()?.off('disconnect');
+      socketIo.close();
+    } catch (error) {
+      console.error('Socket关闭失败:', error);
+    }
+    isSocketConnected.value = false;
+  }
 });
 
-const fetchRoomInfo = () => {
-  socketIo.start();
-  socketIo.send(socketMessage.sendRoomInfo({
-    type: 'getRoomInfo',
-    data: {
-      roomId: roomId.value,
-    }
-  }));
-  socketIo.getSocket().on('roomInfo', (message) => {
-    roomInfo.value = message.data;
-  });
-};
+// 使用 onLoad 获取路由参数并连接
+onLoad(async (option) => {
+  currentRoomId.value = option.roomId || props.roomId;
+  if (currentRoomId.value) {
+    await connectSocket();
+  }
+});
 
 </script>
 

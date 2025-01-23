@@ -90,12 +90,22 @@ class RoomService implements IRoomService {
             if (roomDb.password && roomDb.password !== room.password) {
                 return Promise.reject("密码错误");
             }
-            return await RoomUserModel.create({
+            const existingEntry = await RoomUser.findOne({
+                where: {
+                    userId: userId,
+                    roomId: room.id
+                }
+            });
+            if (existingEntry) {
+                return Promise.reject("用户已在房间中");
+            }
+            const roomUser = await RoomUserModel.create({
                 userId: userId,
                 roomId: room.id,
                 isVisible: room.isVisible,
                 joinedAt: new Date()
             });
+            return Promise.resolve(roomUser);
         } catch (err) {
             console.error("加入房间时发生错误:", err);
             return Promise.reject(err);

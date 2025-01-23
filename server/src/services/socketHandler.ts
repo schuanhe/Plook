@@ -1,9 +1,10 @@
 import { Server as SocketIOServer,Socket } from 'socket.io';
 import { Server } from 'http'
-import {JwtPayload} from 'jsonwebtoken';
+import jwt, {JwtPayload} from 'jsonwebtoken';
 
 import {SocketService} from "./impl/socketService";
 import {SocketEvent, socketGetRoomInfoType, SocketMessage} from "../interfaces";
+import config from "../config";
 
 
 
@@ -15,11 +16,13 @@ export default function (server: Server) {
         const socketService = new SocketService(socket);
         // 判断用户是否登录
         if (socket.handshake.query && socket.handshake.query.token) {
-            const token = socket.handshake.query.token;
+            const token = socket.handshake.query.token as string;
             // TODO: 验证 token 是否有效
-
+            const decoded = jwt.verify(token, config.jwtSecret);
             socket.data.userData = {};
-            socket.data.userData.userId = Number(token);
+            if (typeof decoded !== 'string'){
+                socket.data.userData.userId = Number(decoded.userId);
+            }
             if (!socket.data.userData.userId) {
                 socket.emit(SocketEvent.ERROR, {
                     message: '请先登录'
@@ -47,6 +50,8 @@ export default function (server: Server) {
                 socketService.getRoomInfo(socketMessage, io);
             if (socketMessage.type === "setRoomInfo")
                 socketService.setRoomInfo(socketMessage, io);
+            if (socketMessage.type === "videoAction")
+                socketService.handleVideoAction(socketMessage, io);
         })
 
         socket.on(SocketEvent.ROOM_DB_INFO, (socketMessage:SocketMessage) => {

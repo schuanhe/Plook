@@ -12,7 +12,8 @@
           <SystemMessage :content="content.text" :action="content.action" />
         </template>
         <template v-else>
-          <div class="Message-content" role="alert" aria-live="assertive" aria-atomic="false">
+          <div v-if="position === 'left'" class="Message-author">{{ user.userName || '匿名用户' }}</div>
+          <div class="Message-content">
             <Bubble :content="content.text" :user="user" />
           </div>
         </template>
@@ -82,36 +83,22 @@ const message = {
 <style scoped>
 .Message {
   position: relative;
+  padding: 4px 15px;
 }
 
 .Message + .Message {
-  margin-top: 12px;
-
+  margin-top: 8px;
 }
 
-.Message.right .Message-main,
-.Message.right .Message-content {
-  flex-direction: row-reverse;
-}
-
-.Message.right .Message-author {
+.Message.right {
   text-align: right;
 }
 
-
-.Message.pop {
-  display: none;
+.Message.right .Message-main {
+  flex-direction: row-reverse;
 }
 
-.Message-meta {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 12px;
-  text-align: center;
-}
-
-.Message-main,
-.Message-content {
+.Message-main {
   display: flex;
   align-items: flex-start;
 }
@@ -122,15 +109,25 @@ const message = {
 }
 
 .Message-author {
-  margin-bottom: 6px;
-  color: #666;
+  margin-bottom: 4px;
+  padding-left: 12px;
+  color: #999;
   font-size: 12px;
-  line-height: 1.1;
 }
 
-.ChatApp[data-elder-mode="true"] .SystemMessage-inner {
-  padding: 7px 14px;
-  font-size: 14px;
+.Message-content {
+  display: inline-block;
+  max-width: 80%;
 }
 
+.Message-meta {
+  text-align: center;
+  margin: 8px 0;
+  color: #999;
+  font-size: 12px;
+}
+
+.Message.system {
+  text-align: center;
+}
 </style>
